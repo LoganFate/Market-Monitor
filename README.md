@@ -15,6 +15,7 @@ Users will be able to view certain stocks and track them in real-time. Each stoc
 #### Watchlist Stocks/Pin articles (2):
 - **Create**: Users can add stocks to their watchlist and pin articles to tabbed sections in their profile page.
 - **Read**: Users can navigate to a watchlist/pinned stocks and articles sections to view the corresponding stocks and articles.
+- **Update**: Users can place their watchlisted stocks/pinned articles into different categories to organize them in a section in their user profile page.
 - **Delete**: Users can remove stocks/articles from the corresponding sections from their profile. (Add categories to move each stock/article into on these components for possible UPDATE functionality)
 
 #### Planner/Notes sections (2):
@@ -36,7 +37,11 @@ Users will be able to view certain stocks and track them in real-time. Each stoc
 - **Create**: Users can create trades with fake currency based on real stock movement to see how potential trades will pan out.
 - **Read**: Users can view the status of currently active trades on this page.
 - **Update**: Users can cancel or edit buyout points at any time during an existing trade.
-- **Delete**: Users can cancel active trades at any time and delete from trade history.
+- **Delete**: Users can cancel/end active trades at any time (cash out)
+
+### Trade history:
+- **Read**: Users can view all past trade history in a section of the investment simulator feature.
+- **Delete**: Users can delete past trades from their trade history.
 
 ## Polygon API
 
