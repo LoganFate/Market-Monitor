@@ -48,7 +48,7 @@ Users will be able to view certain stocks and track them in real-time. Each stoc
 - Track active trades status in real time
 
 
-![alt text](image.png)
+![alt text](DB_Schema.png)
 
 ## API Documentation
 
