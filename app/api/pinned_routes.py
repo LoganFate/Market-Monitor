@@ -5,7 +5,7 @@ from sqlalchemy.sql import text
 
 pinned_routes = Blueprint('pinned', __name__)
 
-@pinned_routes.route('/pinned', methods=['POST'])
+@pinned_routes.route('/', methods=['POST'])
 @login_required
 def pin_article():
     data = request.get_json()
@@ -39,19 +39,20 @@ def pin_article():
     return jsonify({"message": "Article pinned successfully with category."}), 201
 
 
-@pinned_routes.route('/pinned', methods=['GET'])
+@pinned_routes.route('/', methods=['GET'])
 @login_required
 def view_pinned_articles():
     articles_data = [{
         "id": article.id,
         "title": article.title,
         "content": article.content,
+        "category": article.category
         # Add other fields as necessary
     } for article in current_user.pinned_articles]
 
     return jsonify(articles_data), 200
 
-@pinned_routes.route('/pinned', methods=['DELETE'])
+@pinned_routes.route('/<int:pinnedId>', methods=['DELETE'])
 @login_required
 def unpin_article():
     article_id = request.args.get('article_id')
@@ -67,3 +68,26 @@ def unpin_article():
     db.session.commit()
 
     return jsonify({"message": "Article unpinned successfully."}), 204
+
+@pinned_routes.route('/<int:pinnedId>', methods=['PUT'])
+@login_required
+def update_pinned_article_category():
+    data = request.get_json()
+    article_ids = data.get('article_ids')
+    new_category = data.get('new_category')
+
+    if not article_ids or not new_category:
+        return jsonify({"error": "Article IDs and new category are required."}), 400
+
+    for article_id in article_ids:
+
+        sql = text("""
+            UPDATE user_pinned
+            SET category = :new_category
+            WHERE user_id = :user_id AND article_id = :article_id
+        """)
+        db.engine.execute(sql, new_category=new_category, user_id=current_user.id, article_id=article_id)
+
+    db.session.commit()
+
+    return jsonify({"message": "Article categories updated successfully."}), 200
