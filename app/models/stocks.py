@@ -5,6 +5,7 @@ class Stock(db.Model):
     symbol = db.Column(db.String(10), nullable=False, unique=True)
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
+    category = db.Column(db.String(50), nullable=True)
     # Add other fields as necessary
 
     def to_dict(self):
@@ -13,5 +14,6 @@ class Stock(db.Model):
             'symbol': self.symbol,
             'name': self.name,
             'price': self.price,
+            'category': self.category
             # Include other fields if necessary after integrating Polygon API
         }
