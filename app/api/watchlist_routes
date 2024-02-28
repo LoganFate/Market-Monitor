@@ -1,0 +1,32 @@
+from flask import Blueprint, jsonify, request
+from flask_login import login_required, current_user
+from app.models import  db, Watchlist, Stock
+
+watchlist_routes = Blueprint('watchlist', __name__)
+
+
+
+@watchlist_routes.route('/watchlist/<int:watchlist_id>', methods=['POST'])
+@login_required
+def add_stock_to_watchlist(watchlist_id):
+    data = request.get_json()
+    stock_id = data.get('stock_id')  # This is expected to be an integer
+
+    if not stock_id:
+        return jsonify({"error": "Stock ID is required."}), 400
+
+    watchlist = Watchlist.query.filter_by(id=watchlist_id, user_id=current_user.id).first()
+    if not watchlist:
+        return jsonify({"error": "Watchlist not found."}), 404
+
+    stock = Stock.query.get(stock_id)  # Works seamlessly with integer IDs
+    if not stock:
+        return jsonify({"error": "Stock not found."}), 404
+
+    if stock in watchlist.stocks:
+        return jsonify({"error": "Stock already in watchlist."}), 409
+
+    watchlist.stocks.append(stock)
+    db.session.commit()
+
+    return jsonify({"message": "Stock added to watchlist successfully."}), 201

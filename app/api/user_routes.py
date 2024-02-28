@@ -1,6 +1,5 @@
 from flask import Blueprint, jsonify, request
 from flask_login import login_required, login_user, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import User, db
 
 user_routes = Blueprint('users', __name__)
@@ -42,11 +41,11 @@ def signup():
 
     new_user = User(
         email=data['email'],
-        password=generate_password_hash(data['password']),
         name=data.get('name'),
         username=data.get('username'),
         user_about=data.get('user_about')
     )
+    new_user.password = data['password']
 
     db.session.add(new_user)
     try:
@@ -69,7 +68,7 @@ def login():
 
     user = User.query.filter_by(email=data['email']).first()
 
-    if user and check_password_hash(user.password, data['password']):
+    if user and user.check_password(data['password']):
 
         login_user(user)
 
@@ -89,9 +88,11 @@ def get_user_profile():
         user_profile = {
             "email": user.email,
             "username": user.username,
-            "user_intro": user.user_intro,
-            "profile_pic": user.profile_pic
+            "user_about": user.user_about,
+            "profile_pic": user.profile_pic,
+            "name": user.name
         }
+
         return jsonify(user_profile), 200
     else:
         return jsonify({"error": "User not found"}), 404
@@ -110,7 +111,9 @@ def update_user_profile():
     data = request.get_json()
     user.name = data.get('name', user.name)
     user.username = data.get('username', user.username)
-    user.user_intro = data.get('user_intro', user.user_intro)
+    user.user_about = data.get('user_about', user.user_about)
+    user.email = data.get('email', user.email)
+    user.profile_pic = data.get('profile_pic', user.profile_pic)
 
     # Add validation errors here ***
 
@@ -118,15 +121,21 @@ def update_user_profile():
         user.name = user.name
     if  user.username is not None:
         user.username = user.username
-    if user.user_intro is not None:
-        user.user_intro = user.user_intro
+    if user.user_about is not None:
+        user.user_about = user.user_about
+    if user.email is not None:
+        user.email = user.email
+    if user.profile_pic is not None:
+        user.profile_pic = user.profile_pic
 
     db.session.commit()
 
     return jsonify({
         "name": user.name,
         "username": user.username,
-        "user_intro": user.user_intro
+        "user_about": user.user_about,
+         "email": user.email,
+        "profile_pic": user.profile_pic
     }), 200
 
 
