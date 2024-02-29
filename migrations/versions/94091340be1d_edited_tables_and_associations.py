@@ -78,7 +78,7 @@ def downgrade():
     sa.ForeignKeyConstraint(['watchlist_id'], ['watchlist.id'], ),
     sa.PrimaryKeyConstraint('watchlist_id', 'stock_id')
     )
-    op.create_table('stock',
+    op.create_table('stocks',
     sa.Column('id', sa.INTEGER(), nullable=False),
     sa.Column('symbol', sa.VARCHAR(length=10), nullable=False),
     sa.Column('name', sa.VARCHAR(length=100), nullable=False),
@@ -92,7 +92,7 @@ def downgrade():
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('article',
+    op.create_table('articles',
     sa.Column('id', sa.INTEGER(), nullable=False),
     sa.Column('title', sa.VARCHAR(length=255), nullable=False),
     sa.Column('content', sa.TEXT(), nullable=False),
