@@ -7,14 +7,15 @@ class Stock(db.Model):
         __table_args__ = {'schema': SCHEMA}
 
     id = db.Column(db.Integer, primary_key=True)
-    symbol = db.Column(db.String(10), nullable=False, unique=True)
+    symbol = db.Column(db.String(10), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
-    category = db.Column(db.String(50), nullable=True)
-    market_cap = db.Column(db.BigInteger, nullable=True)  # Market Capitalization
-    pe_ratio = db.Column(db.Float, nullable=True)  # Price-to-Earnings Ratio
-    sector = db.Column(db.String(100), nullable=True)  # Sector of the company
-    # Add additional fields as needed
+    category = db.Column(db.String(50), nullable=False)
+    market_cap = db.Column(db.Float, nullable=False)
+    pe_ratio = db.Column(db.Float, nullable=False)
+    sector = db.Column(db.String(50), nullable=False)
+    previous_close = db.Column(db.Float)  # Add this field
+    # Add other fields as needed
 
     def to_dict(self):
         return {
@@ -25,6 +26,7 @@ class Stock(db.Model):
             'category': self.category,
             'market_cap': self.market_cap,
             'pe_ratio': self.pe_ratio,
-            'sector': self.sector
-            # Include other new fields in this method
+            'sector': self.sector,
+            'previous_close': self.previous_close,
+            # Add other fields as needed
         }

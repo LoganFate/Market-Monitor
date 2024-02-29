@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from app.models import db, Stock
-from .polygon_helper import fetch_previous_close  # Make sure this import path is correct
+from .polygon_helper import fetch_stock_data
 import os
 
 stock_routes = Blueprint('stocks', __name__)
@@ -20,18 +20,31 @@ def get_stocks():
     enriched_stocks = []
 
     for stock in stocks:
-        symbol = stock.symbol  # Assuming your Stock model has a 'symbol' attribute
-        live_data_response = fetch_previous_close(symbol, API_KEY)  # Pass the API key as an argument
-
-        print(f"Fetching live data for {symbol}: {live_data_response}")  # Debugging line
+        symbol = stock.symbol
+        live_data_response = fetch_stock_data(symbol, API_KEY)
 
         if live_data_response.get('success'):
-            stock_data = stock.to_dict()
-            # Enriching the stock data with live data from Polygon
-            stock_data['previous_close'] = live_data_response.get('previous_close')
-            enriched_stocks.append(stock_data)
+            # Update stock data with live data
+            stock.previous_close = live_data_response.get('previous_close')
+            # Add other fields as needed
+
+            # Commit changes to the database
+            db.session.commit()
+
+            # Append enriched stock data to the response
+            enriched_stock_data = {
+                'symbol': symbol,
+                'name': stock.name,
+                'price': stock.price,
+                'category': stock.category,
+                'market_cap': stock.market_cap,
+                'pe_ratio': stock.pe_ratio,
+                'sector': stock.sector,
+                'previous_close': stock.previous_close,
+                # Add other fields as needed
+            }
+            enriched_stocks.append(enriched_stock_data)
         else:
-            print(f"Error or no data for {symbol}: {live_data_response.get('error', 'Unknown error')}")
-            enriched_stocks.append(stock.to_dict())
+            print(f"Error fetching live data for {symbol}: {live_data_response.get('error', 'Unknown error')}")
 
     return jsonify(enriched_stocks), 200
