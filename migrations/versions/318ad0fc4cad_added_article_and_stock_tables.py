@@ -24,14 +24,14 @@ def upgrade():
  if environment == "production" and SCHEMA:
         # Ensure the schema exists
     op.execute(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA};")
-    op.create_table('articles',
+    op.create_table('article',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=255), nullable=False),
     sa.Column('content', sa.Text(), nullable=False),
     sa.Column('author', sa.String(length=100), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('stocks',
+    op.create_table('stock',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('symbol', sa.String(length=10), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
