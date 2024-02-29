@@ -38,11 +38,6 @@ def upgrade():
     sa.PrimaryKeyConstraint('watchlist_id', 'stock_id')
     )
     # ### end Alembic commands ###
-    if environment == "production":
-        op.execute(f"ALTER TABLE watchlist SET SCHEMA {SCHEMA};")
-
-    if environment == "production":
-        op.execute(f"ALTER TABLE watchlist_stocks SET SCHEMA {SCHEMA};")
 
 
 def downgrade():
