@@ -1,35 +1,37 @@
 from flask import Blueprint, jsonify
-import requests
-from app.models import  db, Stock
+from app.models import db, Stock
+from .polygon_helper import fetch_previous_close  # Make sure this import path is correct
+import os
 
 stock_routes = Blueprint('stocks', __name__)
 
-@stock_routes.route('/api/stocks', methods=['GET'])
+API_KEY = os.getenv('POLYGON_API_KEY')
+
+@stock_routes.route('/', methods=['GET'])
 def get_stocks():
     """
-    User will be able to view stocks on the site, enriched with live data from the Polygon API.
+    Fetch stocks from the database and enrich them with live data from Polygon.io.
     """
-    # Example: Fetching all stocks from your database
-    stocks = Stock.query.all()
+    if not API_KEY:
+        print("API_KEY is not set. Please check your environment variables.")
+        return jsonify({'error': 'API_KEY is missing'}), 500
 
-    # Prepare a list to hold enriched stock data
+    stocks = Stock.query.all()
     enriched_stocks = []
 
     for stock in stocks:
-        # For each stock, attempt to fetch additional data from the Polygon API
-        symbol = stock.symbol  # Assuming each stock model has a 'symbol' field
-        url = f'https://api.polygon.io/v1/open-close/{symbol}/2023-02-28?apiKey={API_KEY}'  # Example API call
-        response = requests.get(url)
+        symbol = stock.symbol  # Assuming your Stock model has a 'symbol' attribute
+        live_data_response = fetch_previous_close(symbol, API_KEY)  # Pass the API key as an argument
 
-        if response.status_code == 200:
-            polygon_data = response.json()
-            # Add or update information from Polygon to your stock data
-            # This is just an example; adjust according to your data model and needs
-            stock_dict = stock.to_dict()
-            stock_dict['polygon_data'] = polygon_data
-            enriched_stocks.append(stock_dict)
+        print(f"Fetching live data for {symbol}: {live_data_response}")  # Debugging line
+
+        if live_data_response.get('success'):
+            stock_data = stock.to_dict()
+            # Enriching the stock data with live data from Polygon
+            stock_data['previous_close'] = live_data_response.get('previous_close')
+            enriched_stocks.append(stock_data)
         else:
-            # Handle cases where the Polygon API does not return data
+            print(f"Error or no data for {symbol}: {live_data_response.get('error', 'Unknown error')}")
             enriched_stocks.append(stock.to_dict())
 
     return jsonify(enriched_stocks), 200
