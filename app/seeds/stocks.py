@@ -13,7 +13,7 @@ def seed_stocks():
         market_cap=2000000000000,
         pe_ratio=30,
         sector='Technology',
-        previous_close=None  # Add this field and set it to None initially
+        previous_close=3.14  # Add this field and set it to None initially
         # Add other fields as needed
     )
     stock2 = Stock(
@@ -24,7 +24,7 @@ def seed_stocks():
         market_cap=1800000000000,
         pe_ratio=35,
         sector='Technology',
-        previous_close=None  # Add this field and set it to None initially
+        previous_close=5.68  # Add this field and set it to None initially
         # Add other fields as needed
     )
     stock3 = Stock(
@@ -35,7 +35,7 @@ def seed_stocks():
         market_cap=1500000000000,
         pe_ratio=25,
         sector='Technology',
-        previous_close=None  # Add this field and set it to None initially
+        previous_close=7.92  # Add this field and set it to None initially
         # Add other fields as needed
     )
 
