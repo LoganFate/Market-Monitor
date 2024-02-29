@@ -7,6 +7,9 @@ Create Date: 2024-02-28 13:50:27.326963
 """
 from alembic import op
 import sqlalchemy as sa
+import os
+environment = os.getenv("FLASK_ENV")
+SCHEMA = os.environ.get("SCHEMA")
 
 
 # revision identifiers, used by Alembic.
@@ -32,6 +35,11 @@ def upgrade():
     sa.PrimaryKeyConstraint('watchlist_id', 'stock_id')
     )
     # ### end Alembic commands ###
+    if environment == "production":
+        op.execute(f"ALTER TABLE watchlist SET SCHEMA {SCHEMA};")
+
+    if environment == "production":
+        op.execute(f"ALTER TABLE watchlist_stocks SET SCHEMA {SCHEMA};")
 
 
 def downgrade():

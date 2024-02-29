@@ -11,6 +11,8 @@ from .api.stock_routes import stock_routes
 from .api.article_routes import article_routes
 from .api.watchlist_routes import watchlist_routes
 from .api.pinned_routes import pinned_routes
+from .api.note_routes import note_routes
+from .api.comment_routes import comment_routes
 from .seeds import seed_commands
 from .config import Config
 
@@ -36,6 +38,8 @@ app.register_blueprint(stock_routes, url_prefix='/api/stocks')
 app.register_blueprint(article_routes, url_prefix='/api/articles')
 app.register_blueprint(watchlist_routes, url_prefix='/api/watchlist')
 app.register_blueprint(pinned_routes, url_prefix='/api/pinned')
+app.register_blueprint(note_routes, url_prefix='/api/notes')
+app.register_blueprint(comment_routes, url_prefix='/api/comments')
 
 db.init_app(app)
 Migrate(app, db)

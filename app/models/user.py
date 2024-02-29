@@ -1,15 +1,16 @@
 from .db import db, environment, SCHEMA, add_prefix_for_prod
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from sqlalchemy.ext.declarative import declared_attr
+
 
 user_pinned = db.Table('user_pinned',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-    db.Column('article_id', db.String(255), db.ForeignKey('articles.id'), primary_key=True),
-    db.Column('category', db.String(50))
+    db.Column('user_id', db.Integer, db.ForeignKey(add_prefix_for_prod('users.id')), primary_key=True),
+    db.Column('article_id', db.String(255), db.ForeignKey(add_prefix_for_prod('articles.id')), primary_key=True),
 )
 user_watchlist = db.Table('user_watchlist',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-    db.Column('stock_id', db.Integer, db.ForeignKey('stocks.id'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey(add_prefix_for_prod('users.id')), primary_key=True),
+    db.Column('stock_id', db.Integer, db.ForeignKey(add_prefix_for_prod('stocks.id')), primary_key=True),
     db.Column('category', db.String(50))
 )
 
@@ -31,6 +32,7 @@ class User(db.Model, UserMixin):
                                        backref=db.backref('watchlisted_by', lazy='dynamic'))
     pinned_articles = db.relationship('Article', secondary=user_pinned,
                                        backref=db.backref('pinned_by', lazy='dynamic'))
+
 
     @property
     def password(self):
