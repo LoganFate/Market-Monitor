@@ -1,11 +1,11 @@
+import os
 from __future__ import with_statement
-
 import logging
 from logging.config import fileConfig
-
 from flask import current_app
-
 from alembic import context
+
+SCHEMA_NAME = os.getenv('SCHEMA')
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -60,7 +60,8 @@ def run_migrations_offline():
     """
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=url, target_metadata=get_metadata(), literal_binds=True
+        url=url, target_metadata=get_metadata(), literal_binds=True,
+        version_table_schema=SCHEMA_NAME
     )
 
     with context.begin_transaction():
@@ -91,6 +92,7 @@ def run_migrations_online():
         context.configure(
             connection=connection,
             target_metadata=get_metadata(),
+            version_table_schema=SCHEMA_NAME,
             process_revision_directives=process_revision_directives,
             **current_app.extensions['migrate'].configure_args
         )
