@@ -3,7 +3,7 @@ from app.models import  db, Article
 
 article_routes = Blueprint('articles', __name__)
 
-@article_routes.route('/api/articles', methods=['GET'])
+@article_routes.route('/', methods=['GET'])
 def get_articles():
     """
     User will be able to view articles on the site.

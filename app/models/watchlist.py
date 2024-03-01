@@ -7,7 +7,7 @@ class Watchlist(db.Model):
     if environment == "production":
         __table_args__ = {'schema': SCHEMA}
 
-    watchlist_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('users.id')), nullable=False)
     stock_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('stocks.id')), nullable=False)
     category = db.Column(db.String(50), nullable=True)
@@ -19,7 +19,6 @@ class Watchlist(db.Model):
 def to_dict(self):
         return {
             'id': self.id,
-            'watchlist_id': self.watchlist_id,
             'user_id': self.user_id,
             'stock_id': self.stock_id,
             'category': self.category

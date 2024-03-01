@@ -6,7 +6,7 @@ class Pinned(db.Model):
     if environment == "production":
         __table_args__ = {'schema': SCHEMA}
 
-    pinned_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod('users.id')), nullable=False)
     article_id = db.Column(db.String(255), db.ForeignKey(add_prefix_for_prod('articles.id')), nullable=False)
     category = db.Column(db.String(50), nullable=True)
@@ -18,7 +18,6 @@ class Pinned(db.Model):
 def to_dict(self):
         return {
             'id': self.id,
-            'pinned_id': self.watchlist_id,
             'user_id': self.user_id,
             'article_id': self.stock_id,
             'category': self.category

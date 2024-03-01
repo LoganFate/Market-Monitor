@@ -17,7 +17,7 @@ class Article(db.Model):
     # Add other fields as necessary, such as publication_date, category, etc.
 
 
-def to_dict(self):
+    def to_dict(self):
         return {
             'id': self.id,
             'title': self.title,
