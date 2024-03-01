@@ -33,24 +33,32 @@ def seed():
         undo_planner()
     seed_users()
     seed_stocks()
-    seed_notes()
-    seed_pinned()
-    seed_watchlist()
-    seed_comments()
     seed_articles()
     seed_planner()
+    seed_watchlist()
+    seed_notes()
+    seed_pinned()
+    seed_comments()
+
     # Add other seed functions here
 
 
 # Creates the `flask seed undo` command
 @seed_commands.command('undo')
 def undo():
-    undo_users()
-    undo_stocks()
-    undo_notes()
-    undo_pinned()
-    undo_watchlist()
     undo_comments()
-    undo_articles()
+    undo_pinned()
+    undo_notes()
+    undo_watchlist()
     undo_planner()
+    undo_articles()
+    undo_stocks()
+    undo_users()
+
+
+
+
+
+
+
     # Add other undo functions here
