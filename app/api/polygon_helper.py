@@ -39,8 +39,6 @@ def fetch_stock_data(symbol, api_key):
 
         return result
 
-    import time
-import requests
 
 def fetch_stock_data_with_retry(symbol, api_key, retries=3, backoff_factor=0.3):
     for attempt in range(retries):
