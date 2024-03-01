@@ -1,19 +1,54 @@
 from app.models import db, User, environment, SCHEMA
 from sqlalchemy.sql import text
+from werkzeug.security import generate_password_hash
 
 
 # Adds a demo user, you can add other users here if you want
 def seed_users():
-    demo = User(
-        username='Demo', email='demo@aa.io', password='password')
-    marnie = User(
-        username='marnie', email='marnie@aa.io', password='password')
-    bobbie = User(
-        username='bobbie', email='bobbie@aa.io', password='password')
+    users = [
+        User(
+            username='DemoUser1',
+            email='demo1@example.com',
+            password=generate_password_hash('password1'),
+            name='Demo User 1',
+            user_about='About Demo User 1',
+            profile_pic='/path/to/profile1.jpg'
+        ),
+        User(
+            username='DemoUser2',
+            email='demo2@example.com',
+            password=generate_password_hash('password2'),
+            name='Demo User 2',
+            user_about='About Demo User 2',
+            profile_pic='/path/to/profile2.jpg'
+        ),
+        User(
+            username='DemoUser3',
+            email='demo3@example.com',
+            password=generate_password_hash('password3'),
+            name='Demo User 3',
+            user_about='About Demo User 3',
+            profile_pic='/path/to/profile3.jpg'
+        ),
+        User(
+            username='DemoUser4',
+            email='demo4@example.com',
+            password=generate_password_hash('password4'),
+            name='Demo User 4',
+            user_about='About Demo User 4',
+            profile_pic='/path/to/profile4.jpg'
+        ),
+        User(
+            username='DemoUser5',
+            email='demo5@example.com',
+            password=generate_password_hash('password5'),
+            name='Demo User 5',
+            user_about='About Demo User 5',
+            profile_pic='/path/to/profile5.jpg'
+        )
+    ]
 
-    db.session.add(demo)
-    db.session.add(marnie)
-    db.session.add(bobbie)
+    db.session.bulk_save_objects(users)
     db.session.commit()
 
 
@@ -28,5 +63,5 @@ def undo_users():
         db.session.execute(f"TRUNCATE table {SCHEMA}.users RESTART IDENTITY CASCADE;")
     else:
         db.session.execute(text("DELETE FROM users"))
-        
+
     db.session.commit()
