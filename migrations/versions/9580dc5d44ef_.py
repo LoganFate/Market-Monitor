@@ -116,14 +116,14 @@ def upgrade():
     # ### end Alembic commands ###
 
     if environment == "production":
-        op.execute(f"ALTER TABLE articles, SET SCHEMA {SCHEMA}")
-        op.execute(f"ALTER TABLE stocks, SET SCHEMA {SCHEMA}")
-        op.execute(f"ALTER TABLE users, SET SCHEMA {SCHEMA}")
-        op.execute(f"ALTER TABLE comments, SET SCHEMA {SCHEMA}")
-        op.execute(f"ALTER TABLE notes, SET SCHEMA {SCHEMA}")
-        op.execute(f"ALTER TABLE pinned, SET SCHEMA {SCHEMA}")
-        op.execute(f"ALTER TABLE planner, SET SCHEMA {SCHEMA}")
-        op.execute(f"ALTER TABLE users, SET SCHEMA {SCHEMA}")
+        op.execute(f"ALTER TABLE articles SET SCHEMA {SCHEMA}")
+        op.execute(f"ALTER TABLE stocks SET SCHEMA {SCHEMA}")
+        op.execute(f"ALTER TABLE users SET SCHEMA {SCHEMA}")
+        op.execute(f"ALTER TABLE comments SET SCHEMA {SCHEMA}")
+        op.execute(f"ALTER TABLE notes SET SCHEMA {SCHEMA}")
+        op.execute(f"ALTER TABLE pinned SET SCHEMA {SCHEMA}")
+        op.execute(f"ALTER TABLE planner SET SCHEMA {SCHEMA}")
+        op.execute(f"ALTER TABLE users SET SCHEMA {SCHEMA}")
 
 
 def downgrade():
