@@ -67,8 +67,8 @@ def upgrade():
     sa.Column('article_id', sa.String(length=255), nullable=False),
     sa.Column('text', sa.Text(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['article_id'], ['articles.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['article_id'], [f'{SCHEMA}.articles.id' if SCHEMA else 'articles.id']),
+    sa.ForeignKeyConstraint(['user_id'], [f'{SCHEMA}.users.id' if SCHEMA else 'users.id']),
     sa.PrimaryKeyConstraint('id'),
     schema=SCHEMA if environment == 'production' else None
     )
@@ -78,8 +78,8 @@ def upgrade():
     sa.Column('stock_id', sa.Integer(), nullable=False),
     sa.Column('text', sa.Text(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['stock_id'], ['stocks.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['stock_id'], [f'{SCHEMA}.stocks.id' if SCHEMA else 'stocks.id']),
+    sa.ForeignKeyConstraint(['user_id'], [f'{SCHEMA}.users.id' if SCHEMA else 'users.id']),
     sa.PrimaryKeyConstraint('id'),
     schema=SCHEMA if environment == 'production' else None
     )
@@ -88,8 +88,8 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('article_id', sa.Integer(), nullable=False),
     sa.Column('category', sa.String(length=50), nullable=True),
-    sa.ForeignKeyConstraint(['article_id'], ['articles.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['article_id'], [f'{SCHEMA}.articles.id' if SCHEMA else 'articles.id']),
+    sa.ForeignKeyConstraint(['user_id'], [f'{SCHEMA}.users.id' if SCHEMA else 'users.id']),
     sa.PrimaryKeyConstraint('id'),
     schema=SCHEMA if environment == 'production' else None
     )
@@ -99,7 +99,7 @@ def upgrade():
     sa.Column('category', sa.String(length=50), nullable=False),
     sa.Column('text', sa.Text(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], [f'{SCHEMA}.users.id' if SCHEMA else 'users.id']),
     sa.PrimaryKeyConstraint('id'),
     schema=SCHEMA if environment == 'production' else None
     )
@@ -108,8 +108,8 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('stock_id', sa.Integer(), nullable=False),
     sa.Column('category', sa.String(length=50), nullable=True),
-    sa.ForeignKeyConstraint(['stock_id'], ['stocks.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['stock_id'], [f'{SCHEMA}.stocks.id' if SCHEMA else 'stocks.id']),
+    sa.ForeignKeyConstraint(['user_id'], [f'{SCHEMA}.users.id' if SCHEMA else 'users.id']),
     sa.PrimaryKeyConstraint('id'),
     schema=SCHEMA if environment == 'production' else None
     )
