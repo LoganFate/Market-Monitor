@@ -1,0 +1,71 @@
+.about-section {
+    text-align: center;
+    padding: 50px 20px;
+
+}
+
+.about-section h1 {
+    font-size: 2.5em; /* Adjust size as needed */
+    color: #095112; /* dark grey color for the text */
+    margin-bottom: 0.5em;
+}
+
+.about-section p {
+    color: #666; /* lighter grey color for the text */
+    font-size: 1.2em; /* Adjust size as needed */
+    line-height: 1.6;
+    margin-bottom: 2em;
+}
+
+.about-section button {
+    background-color: #0c8446; /* blue color for the button */
+    color: white;
+    border: none;
+    padding: 1em 1.5em;
+    font-size: 1em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.about-section button:hover {
+    background-color: #093c13; /* darker blue color on hover */
+}
+
+.features-section {
+    display: flex;
+    justify-content: space-evenly;
+    padding: 50px 20px;
+    flex-wrap: wrap; /* ensures responsiveness */
+}
+
+.feature {
+    width: 30%; /* adjust width as necessary */
+    margin: 1em;
+    padding: 1em;
+    text-align: center;
+}
+
+.feature h2 {
+    color: #0c8446; /* blue color for the feature titles */
+    margin-bottom: 0.5em;
+}
+
+.feature p {
+    color: #666; /* light grey color for the text */
+    font-size: 1em;
+    line-height: 1.6;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .features-section {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .feature {
+        width: 80%; /* full width on smaller screens */
+        margin-bottom: 2em;
+    }
+}

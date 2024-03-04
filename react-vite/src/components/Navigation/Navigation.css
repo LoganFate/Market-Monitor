@@ -1,3 +1,74 @@
-.profile-dropdown {
-  position: absolute;
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: whitesmoke; /* Change to your preferred color */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo img {
+  height: 50px; /* Adjust the size as necessary */
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px /* Aligns the logo and text vertically */
+}
+
+.logo-text {
+  margin-left: 10px; /* Adjust space between logo and text */
+  font-size: 2.0em; /* Increase font size */
+  font-weight: bold;
+  font-style: italic; /* Make text italic */
+  color: rgb(9, 96, 9); /* Set text color to green */
+  /* Adjust weight as necessary, some fonts do not support italic when bold */
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li {
+  margin-left: 20px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: whitesmoke; /* Color for links */
+  padding: 0.5rem 1rem;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: whitesmoke; /* Color when hovered */
+}
+
+.button {
+  background-color: #0c8446; /* Background color for the 'Home' button */
+  color: whitesmoke;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+}
+
+.button:hover {
+  background-color: #093c13; /* Darker shade for hover state */
+}
+
+/* Hidden by default */
+.profile-link,
+.home-link {
+  display: none;
+}
+
+/* Visible when user is logged in - you'll add a class to <body> tag based on auth state */
+.user-logged-in .profile-link,
+.user-logged-in .home-link {
+  display: block;
 }
