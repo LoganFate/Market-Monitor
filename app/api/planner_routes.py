@@ -31,10 +31,10 @@ def add_plan():
 @planner_routes.route('', methods=['GET'])
 @login_required
 def view_plans():
-    # Retrieve all planner entries for the current user
+
     plans = Planner.query.filter_by(user_id=current_user.id).all()
 
-    # Convert each plan to its dictionary representation
+
     plans_data = [plan.to_dict() for plan in plans]
 
     return jsonify(plans_data), 200
@@ -46,13 +46,13 @@ def update_plan(plan_id):
     planner_category = data.get('planner_category')
     plan_text = data.get('plan_text')
 
-    # Retrieve the plan to update
+
     plan = Planner.query.filter_by(id=plan_id, user_id=current_user.id).first()
 
     if not plan:
         return jsonify({"error": "Plan not found"}), 404
 
-    # Update the plan's category and text if provided
+
     if planner_category:
         plan.category = planner_category
     if plan_text:
@@ -65,7 +65,7 @@ def update_plan(plan_id):
 @planner_routes.route('/<int:plan_id>', methods=['DELETE'])
 @login_required
 def delete_plan(plan_id):
-    # Retrieve the plan to delete
+
     plan = Planner.query.filter_by(id=plan_id, user_id=current_user.id).first()
 
     if not plan:

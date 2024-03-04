@@ -11,16 +11,16 @@ def add_note():
     stock_id = data.get('stock_id')
     note_text = data.get('note_text')
 
-    # Validate inputs
+
     if not stock_id or not note_text:
         return jsonify({"error": "Missing stock ID or note text"}), 400
 
-    # Ensure the stock exists
+
     stock = Stock.query.get(stock_id)
     if not stock:
         return jsonify({"error": "Stock not found"}), 404
 
-    # Create a new Note object
+
     new_note = Note(
         user_id=current_user.id,
         stock_id=stock_id,
@@ -36,7 +36,7 @@ def add_note():
 @note_routes.route('/<int:stock_id>', methods=['GET'])
 @login_required
 def view_notes(stock_id):
-    # Ensure the stock exists
+
     stock = Stock.query.get(stock_id)
     if not stock:
         return jsonify({"error": "Stock not found"}), 404

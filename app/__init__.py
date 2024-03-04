@@ -13,6 +13,7 @@ from .api.watchlist_routes import watchlist_routes
 from .api.pinned_routes import pinned_routes
 from .api.note_routes import note_routes
 from .api.comment_routes import comment_routes
+from .api.planner_routes import planner_routes
 from .seeds import seed_commands
 from .config import Config
 
@@ -40,6 +41,7 @@ app.register_blueprint(watchlist_routes, url_prefix='/api/watchlist')
 app.register_blueprint(pinned_routes, url_prefix='/api/pinned')
 app.register_blueprint(note_routes, url_prefix='/api/notes')
 app.register_blueprint(comment_routes, url_prefix='/api/comments')
+app.register_blueprint(planner_routes, url_prefix='/api/planner')
 
 db.init_app(app)
 Migrate(app, db)

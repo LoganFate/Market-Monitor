@@ -45,13 +45,15 @@ def add_stock_to_watchlist():
 def view_watchlist():
     stocks_data = []
     for watchlist_entry in current_user.watchlist_stocks:
-        print(f"Stock ID: {watchlist_entry.stock_id}")  # Debugging line
+
         if watchlist_entry.stock:
             stocks_data.append({
                 "id": watchlist_entry.stock.id,
                 "symbol": watchlist_entry.stock.symbol,
                 "name": watchlist_entry.stock.name,
                 "price": watchlist_entry.stock.price,
+                "category": watchlist_entry.stock.category
+                # add additional categories
             })
         else:
             print(f"Watchlist entry {watchlist_entry.id} has no associated stock.")
@@ -73,18 +75,18 @@ def update_watchlist_by_stock():
     stock_id = data.get('stock_id')
     new_category = data.get('category')
 
-    # Ensure both stock_id and new category are provided in the request
+
     if not stock_id or not new_category:
         return jsonify({"error": "Missing stock ID or new category"}), 400
 
-    # Find and update all watchlist entries for the current user that match the given stock_id
+
     updated_entries = Watchlist.query.filter_by(user_id=current_user.id, stock_id=stock_id).update({'category': new_category})
 
-    # If no entries were found and updated, return an error
+
     if updated_entries == 0:
         return jsonify({"error": "No watchlist items found for the provided stock ID"}), 404
 
-    # Otherwise, commit the changes and return a success message
+
     try:
         db.session.commit()
         return jsonify({"message": "Watchlist updated successfully"}), 200
@@ -95,16 +97,18 @@ def update_watchlist_by_stock():
 @watchlist_routes.route('/', methods=['DELETE'])
 @login_required
 def remove_from_watchlist():
-    stock_id = request.args.get('stock_id')
+    data = request.get_json()
+    stock_id = data.get('stock_id')
 
     if not stock_id:
         return jsonify({"error": "Stock ID is required."}), 400
 
-    stock = Stock.query.filter_by(id=stock_id).first()
-    if not stock or stock not in current_user.stocks:
+    watchlist_entry = Watchlist.query.filter_by(user_id=current_user.id, stock_id=stock_id).first()
+
+    if not watchlist_entry:
         return jsonify({"error": "Stock not found in watchlist."}), 404
 
-    current_user.stocks.remove(stock)
+    db.session.delete(watchlist_entry)
     db.session.commit()
 
     return '', 204

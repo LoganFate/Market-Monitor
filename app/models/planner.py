@@ -15,7 +15,7 @@ class Planner(db.Model):
     user = db.relationship('User', backref=db.backref('planner_entries', lazy=True))
 
 
-def to_dict(self):
+    def to_dict(self):
 
         return {
             'id': self.id,

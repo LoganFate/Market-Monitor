@@ -24,14 +24,14 @@ def get_stocks():
         live_data_response = fetch_stock_data(symbol, API_KEY)
 
         if live_data_response.get('success'):
-            # Update stock data with live data
-            stock.previous_close = live_data_response.get('previous_close')
-            # Add other fields as needed
 
-            # Commit changes to the database
+            stock.previous_close = live_data_response.get('previous_close')
+
+
+
             db.session.commit()
 
-            # Append enriched stock data to the response
+
             enriched_stock_data = {
                 'symbol': symbol,
                 'name': stock.name,

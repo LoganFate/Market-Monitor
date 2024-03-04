@@ -9,7 +9,7 @@ def seed_users():
         User(
             username='DemoUser1',
             email='demo1@example.com',
-            password=generate_password_hash('password1'),
+            password='password1',
             name='Demo User 1',
             user_about='About Demo User 1',
             profile_pic='/path/to/profile1.jpg'
@@ -17,7 +17,7 @@ def seed_users():
         User(
             username='DemoUser2',
             email='demo2@example.com',
-            password=generate_password_hash('password2'),
+            password='password2',
             name='Demo User 2',
             user_about='About Demo User 2',
             profile_pic='/path/to/profile2.jpg'
@@ -25,7 +25,7 @@ def seed_users():
         User(
             username='DemoUser3',
             email='demo3@example.com',
-            password=generate_password_hash('password3'),
+            password='password3',
             name='Demo User 3',
             user_about='About Demo User 3',
             profile_pic='/path/to/profile3.jpg'
@@ -33,7 +33,7 @@ def seed_users():
         User(
             username='DemoUser4',
             email='demo4@example.com',
-            password=generate_password_hash('password4'),
+            password='password4',
             name='Demo User 4',
             user_about='About Demo User 4',
             profile_pic='/path/to/profile4.jpg'
@@ -41,7 +41,7 @@ def seed_users():
         User(
             username='DemoUser5',
             email='demo5@example.com',
-            password=generate_password_hash('password5'),
+            password='password5',
             name='Demo User 5',
             user_about='About Demo User 5',
             profile_pic='/path/to/profile5.jpg'

@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
-from app.models import  db, Article, User
+from app.models import  db, Article, Pinned
 from sqlalchemy.sql import text
 
 pinned_routes = Blueprint('pinned', __name__)
@@ -20,7 +20,7 @@ def pin_article():
         return jsonify({"error": "Article not found."}), 404
 
     existing_pin = db.session.execute(
-        text("SELECT 1 FROM user_pinned WHERE user_id=:user_id AND article_id=:article_id"),
+        text("SELECT 1 FROM pinned WHERE user_id=:user_id AND article_id=:article_id"),
         {"user_id": current_user.id, "article_id": article_id}
     ).fetchone()
 
@@ -29,7 +29,7 @@ def pin_article():
 
     db.session.execute(
         text("""
-            INSERT INTO user_pinned (user_id, article_id, category)
+            INSERT INTO pinned (user_id, article_id, category)
             VALUES (:user_id, :article_id, :category)
         """),
         {"user_id": current_user.id, "article_id": article_id, "category": category}
@@ -42,52 +42,66 @@ def pin_article():
 @pinned_routes.route('/', methods=['GET'])
 @login_required
 def view_pinned_articles():
-    articles_data = [{
-        "id": article.id,
-        "title": article.title,
-        "content": article.content,
-        "category": article.category
-        # Add other fields as necessary
-    } for article in current_user.pinned_articles]
+ articles_data = []
 
-    return jsonify(articles_data), 200
+ for pinned in current_user.pinned_articles:
+        article = pinned.article
+        if article:
+            articles_data.append({
+                "id": article.id,
+                "title": article.title,
+                "content": article.content,
+                "category": article.category
+                # Add other fields as necessary from the Article model
+            })
+        else:
+            print(f"Pinned entry {pinned.id} has no associated article.")
 
-@pinned_routes.route('/<int:pinnedId>', methods=['DELETE'])
+ return jsonify(articles_data), 200
+
+@pinned_routes.route('/', methods=['DELETE'])
 @login_required
 def unpin_article():
-    article_id = request.args.get('article_id')
+   data = request.get_json()
+   article_id = data.get('article_id')
 
-    if not article_id:
+   if not article_id:
         return jsonify({"error": "Article ID is required."}), 400
 
-    article = Article.query.filter_by(id=article_id).first()
-    if not article or article not in current_user.pinned_articles:
+
+   pinned_entry = Pinned.query.filter_by(user_id=current_user.id, article_id=article_id).first()
+
+   if not pinned_entry:
         return jsonify({"error": "Article not found in pinned articles."}), 404
 
-    current_user.pinned_articles.remove(article)
-    db.session.commit()
 
-    return jsonify({"message": "Article unpinned successfully."}), 204
+   db.session.delete(pinned_entry)
+   db.session.commit()
 
-@pinned_routes.route('/<int:pinnedId>', methods=['PUT'])
+   return jsonify({"message": "Article unpinned successfully."}), 204
+
+@pinned_routes.route('/', methods=['PUT'])
 @login_required
 def update_pinned_article_category():
     data = request.get_json()
-    article_ids = data.get('article_ids')
-    new_category = data.get('new_category')
+    article_id = data.get('article_id')
+    category = data.get('category')
 
-    if not article_ids or not new_category:
-        return jsonify({"error": "Article IDs and new category are required."}), 400
 
-    for article_id in article_ids:
+    if not article_id or not category:
+        return jsonify({"error": "Article ID and new category are required."}), 400
 
-        sql = text("""
-            UPDATE user_pinned
-            SET category = :new_category
-            WHERE user_id = :user_id AND article_id = :article_id
-        """)
-        db.engine.execute(sql, new_category=new_category, user_id=current_user.id, article_id=article_id)
 
-    db.session.commit()
+    updated_entry = Pinned.query.filter_by(user_id=current_user.id, article_id=article_id).update({'category': category}, synchronize_session=False)
 
-    return jsonify({"message": "Article categories updated successfully."}), 200
+
+    if updated_entry == 0:
+        return jsonify({"error": "No pinned article found with the provided article ID"}), 404
+
+
+    try:
+        db.session.commit()
+        return jsonify({"message": "Pinned article category updated successfully."}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Failed to update pinned article category. Error: {str(e)}"}), 500
