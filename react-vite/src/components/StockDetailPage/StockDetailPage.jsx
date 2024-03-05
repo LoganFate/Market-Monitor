@@ -1,94 +1,141 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
+import { createChart, CrosshairMode } from 'lightweight-charts';
 import 'chart.js/auto';
-
 
 
 const StockDetailPage = () => {
     const { stockSymbol } = useParams();
-    const [stockData, setStockData] = useState({ prices: [], timestamps: [] });
-    const [chartData, setChartData] = useState({});
+    const lineChartContainerRef = useRef(null); // Ref for the line chart container if needed
+    const chartContainerRef = useRef(null); // Ref for the Lightweight Chart container
+    const [stockData, setStockData] = useState({ prices: [], timestamps: [], candlestickData: [] });
     const [ws, setWs] = useState(null);
-    const chartRef = useRef(null);
+    const [chart, setChart] = useState(null);
+    const [series, setSeries] = useState(null);
 
     useEffect(() => {
-        setStockData({ prices: [], timestamps: [] });
+        // Initialize the chart only once
+        if (chartContainerRef.current && !chart) {
+            const newChart = createChart(chartContainerRef.current, {
+                width: chartContainerRef.current.offsetWidth,
+                height: 300,
+                layout: {
+                    backgroundColor: '#FFFFFF',
+                    textColor: '#333',
+                },
+                grid: {
+                    vertLines: {
+                        color: '#ECECEC',
+                    },
+                    horzLines: {
+                        color: '#ECECEC',
+                    },
+                },
+                priceScale: {
+                    scaleMargins: {
+                        top: 0.5,
+                        bottom: 0.25,
+                    },
+                    borderVisible: false,
+                },
+                timeScale: {
+                    borderVisible: false,
+                },
+                crosshair: {
+                    mode: CrosshairMode.Normal,
+                },
+            });
+            const newSeries = newChart.addCandlestickSeries();
+            setChart(newChart);
+            setSeries(newSeries);
 
-        if (ws) {
-            // Unsubscribe from the previous symbol's updates
-            ws.send(JSON.stringify({ action: "unsubscribe", params: `A.${stockSymbol}` }));
-        }
+
+        return () => {
+            newChart.remove();
+            setChart(null);
+            setSeries(null);
+        };
+    }
+ }, []);
 
 
+    useEffect(() => {
         const websocket = new WebSocket('wss://delayed.polygon.io/stocks');
-        setWs(websocket);
 
         websocket.onopen = () => {
             console.log('WebSocket Connected');
-            // Immediately authenticate and subscribe upon connection
-            const apiKey = 'unLg31iXhM99E5yWodIRsOe3pugcBLnl'; // Ensure you use the correct way to access your API key
-            websocket.send(JSON.stringify({ action: "auth", params: apiKey }));
+            // Only send messages after the connection is open
+            websocket.send(JSON.stringify({ action: "auth", params: 'unLg31iXhM99E5yWodIRsOe3pugcBLnl' }));
             websocket.send(JSON.stringify({ action: "subscribe", params: `A.${stockSymbol}` }));
         };
 
         websocket.onmessage = (event) => {
             console.log('WebSocket message received:', event.data);
             const messages = JSON.parse(event.data);
+
             messages.forEach(message => {
                 if (message.ev && message.ev === 'A') {
-                    const newTimestamp = new Date(message.s).toLocaleTimeString();
+                    const newTimestamp = Math.floor(new Date(message.s).getTime() / 1000); // Lightweight Charts uses UNIX timestamp in seconds
+                    const newCandlestickData = {
+                        time: newTimestamp,
+                        open: message.o,
+                        high: message.h,
+                        low: message.l,
+                        close: message.c,
+                    };
+
+                    // Update the React state for prices and timestamps
                     setStockData(prevData => ({
-                        prices: [...prevData.prices, message.c],
-                        timestamps: [...prevData.timestamps, newTimestamp].slice(-60),
+                        ...prevData,
+                        prices: [...prevData.prices, message.c].slice(-60),
+                        timestamps: [...prevData.timestamps, new Date(message.s).toLocaleTimeString()].slice(-60),
+                        candlestickData: [...prevData.candlestickData, newCandlestickData].slice(-60)
                     }));
+
+                    // Only try to update the series if it exists
+                    if (series) {
+                        series.update(newCandlestickData);
+                        // chart.timeScale().fitContent();
+                    }
                 }
             });
         };
-        // Clean up on component unmount
+
+        // This cleanup function belongs to the useEffect and ensures WebSocket is closed when component unmounts or stockSymbol changes
         return () => {
-            if (ws && ws.readyState === WebSocket.OPEN) {
+            if (websocket.readyState === WebSocket.OPEN) {
                 websocket.send(JSON.stringify({ action: "unsubscribe", params: `A.${stockSymbol}` }));
-                ws.close();
+                websocket.close();
             }
         };
-    }, [stockSymbol]);
-
-    useEffect(() => {
-        if (chartRef.current) {
-            chartRef.current.data.labels = stockData.timestamps;
-            chartRef.current.data.datasets[0].data = stockData.prices;
-            chartRef.current.update();
-        } else {
-            // Initialize the chart data
-            setChartData({
-                labels: stockData.timestamps,
-                datasets: [{
-                    label: `${stockSymbol} Stock Price`,
-                    data: stockData.prices,
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1
-                }]
-            });
-        }
-    }, [stockData, stockSymbol]);
-    // Attempt to send a ping every second, but only if the WebSocket is open
-    // useEffect(() => {
-    //     const pingInterval = setInterval(() => {
-    //         if (ws && ws.readyState === WebSocket.OPEN) {
-    //             ws.send(JSON.stringify({ action: "ping" }));
-    //         }
-    //     }, 15 * 60 * 1000); // Ping every second
-
-    //     return () => clearInterval(pingInterval);
-    // }, [ws]);
-
-    // console.log('Current stockData state:', stockData);
+    }, [stockSymbol, series]); // Add `series` to useEffect dependencies to ensure it captures the latest series instance.
+    // Line chart data setup
+    const lineChartData = {
+        labels: stockData.timestamps,
+        datasets: [{
+            label: `${stockSymbol} Stock Price`,
+            data: stockData.prices,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1,
+        }],
+    };
 
     return (
         <div>
             <h2>Stock Details for {stockSymbol}</h2>
-            {stockData.prices.length > 0 ? <Line data={chartData} /> : <p>No data available.</p>}
+            <div>
+                <h3>Line Chart</h3>
+                {stockData.prices.length > 0 ? (
+                    <Line data={lineChartData} />
+                ) : (
+                    <p>No line chart data available.</p>
+                )}
+            </div>
+            <div>
+                <h3>Candlestick Chart</h3>
+                <div ref={chartContainerRef} style={{ width: '600px', height: '300px' }}></div>
+            </div>
         </div>
     );
 };
