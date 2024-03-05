@@ -1,0 +1,57 @@
+
+
+.modal-signup-form {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px; /* Adjust based on your design preference */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin: auto;
+  }
+
+  .modal-signup-form h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .modal-signup-form form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-signup-form label {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-signup-form input,
+  .modal-signup-form textarea {
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .modal-signup-form textarea {
+    height: 100px; /* Adjust as needed */
+  }
+
+  .modal-signup-form .error {
+    color: red;
+    font-size: 0.8em;
+  }
+
+  .modal-signup-form button {
+    background-color: #0c8446;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+
+  .modal-signup-form button:hover {
+    background-color: #093c13;
+  }

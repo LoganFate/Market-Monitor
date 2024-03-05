@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 from flask import Flask, render_template, request, session, redirect
 from flask_cors import CORS
 from flask_migrate import Migrate
@@ -23,6 +24,9 @@ app = Flask(__name__, static_folder='../react-vite/dist', static_url_path='/')
 login = LoginManager(app)
 login.login_view = 'auth.unauthorized'
 
+load_dotenv()
+
+API_KEY = os.getenv('POLYGON_API_KEY')
 
 @login.user_loader
 def load_user(id):

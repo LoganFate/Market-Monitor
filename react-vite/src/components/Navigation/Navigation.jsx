@@ -1,8 +1,34 @@
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux';
 import logoImg from '/MarketMonitorLogo.jpg';
+import { useModal } from "../../context/Modal";
+import LoginFormModal from '../LoginFormModal';
+import SignupFormModal from "../SignupFormModal"
+import { thunkLogout } from "../../redux/session";
 import "./Navigation.css";
 
-function Navigation({ isLoggedIn }) { // Pass isLoggedIn as a prop
+function Navigation() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { setModalContent } = useModal();
+  const user = useSelector(state => state.session.user);
+
+
+  const openLoginModal = () => {
+    setModalContent(<LoginFormModal />);
+  };
+
+  const openSignupModal = () => {
+    setModalContent(<SignupFormModal />);
+  };
+
+  const handleLogout = () => {
+    dispatch(thunkLogout()).then(() => {
+      navigate("/");
+    });
+  };
+
+
   return (
     <nav>
 
@@ -14,16 +40,18 @@ function Navigation({ isLoggedIn }) { // Pass isLoggedIn as a prop
           </div>
 
       <ul className="nav-links">
-        {!isLoggedIn && ( // Show these links if the user is NOT logged in
+        {!user && (
           <>
-            <li><Link to="/login" className="button">Login</Link></li>
-            <li><Link to="/signup" className="button">Signup</Link></li>
+             <button onClick={openLoginModal} className="button">Login</button>
+             <li><button onClick={openSignupModal} className="button">Signup</button></li>
           </>
         )}
-        {isLoggedIn && ( // Show these links if the user IS logged in
+        {user && (
           <>
-            <li><Link to="/profile" className="button">Profile</Link></li>
-            <li><Link to="/home" className="button">Home</Link></li>
+          <button onClick={() => navigate("/home")} className="button">Home</button>
+             <button onClick={() => navigate("/profile")} className="button">Profile</button>
+
+            <button onClick={handleLogout} className="button">Logout</button>
           </>
         )}
       </ul>

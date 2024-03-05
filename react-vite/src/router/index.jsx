@@ -1,8 +1,9 @@
 import { createBrowserRouter } from 'react-router-dom';
-import LoginFormPage from '../components/LoginFormPage';
-import SignupFormPage from '../components/SignupFormPage';
-import LandingPage from '../components/LandingPage'
+import LandingPage from '../components/LandingPage';
+import HomePage from '../components/HomePage'
+import StockDetailPage from '../components/StockDetailPage';
 import Layout from './Layout';
+
 
 export const router = createBrowserRouter([
   {
@@ -13,13 +14,13 @@ export const router = createBrowserRouter([
         element: <LandingPage />,
       },
       {
-        path: "login",
-        element: <LoginFormPage />,
+        path: "/home",
+        element: <HomePage />
       },
       {
-        path: "signup",
-        element: <SignupFormPage />,
-      },
+        path: "/stock/:stockSymbol",
+        element: <StockDetailPage />
+      }
     ],
   },
 ]);

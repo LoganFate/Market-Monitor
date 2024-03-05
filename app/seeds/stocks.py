@@ -1,5 +1,6 @@
 from app.models import db, Stock, environment, SCHEMA
 from sqlalchemy.sql import text
+import os
 
 # Define your stock data here
 # Define your stock data here

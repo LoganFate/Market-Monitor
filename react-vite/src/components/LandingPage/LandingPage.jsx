@@ -1,4 +1,5 @@
-import './LandingPage.css'
+import { Link } from "react-router-dom";
+import './LandingPage.css';
 
 const LandingPage = () => {
     return (
@@ -6,7 +7,7 @@ const LandingPage = () => {
             <header className="about-section">
                 <h1>About Market-Monitor</h1>
                 <p>Market-Monitor provides you the ability to plan, track, and research stock movement in real time to develop intelligent and calculated trading strategies that you feel confident about.</p>
-                <button>Sign up</button>
+                <Link to="/signup" className="signup-button">Signup</Link>
             </header>
             <section className="features-section">
                 <div className="feature">

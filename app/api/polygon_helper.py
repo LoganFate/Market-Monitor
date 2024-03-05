@@ -1,49 +1,43 @@
 from polygon import RESTClient
 import time
 import requests
+import datetime
 
-def fetch_stock_data(symbol, api_key):
-    try:
-        client = RESTClient(api_key)
+def fetch_multiple_stocks_data(symbols, api_key):
+    base_url = "https://api.polygon.io/v2/aggs/ticker"
+    stock_data = []
 
-        # Fetch the last close price, last trade, and last quote
-        # Assuming the API provides a way to fetch the previous close directly, otherwise, we use aggregates
+    for symbol in symbols:
+        # For example, fetching daily open/close data
+        url = f"{base_url}/{symbol}/prev?adjusted=true&apiKey={api_key}"
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            if 'results' in data and len(data['results']) > 0:
+                result = data['results'][0]  # Assuming we're interested in the most recent result
+                stock_info = {
+                    'symbol': symbol,
+                    'open': result.get('o'),
+                    'close': result.get('c'),
+                    'high': result.get('h'),
+                    'low': result.get('l'),
+                    'volume': result.get('v'),
+                    # Add other fields as needed based on response structure
+                }
+                stock_data.append(stock_info)
+            else:
+                stock_data.append({'symbol': symbol, 'error': 'No data found'})
+        else:
+            stock_data.append({'symbol': symbol, 'error': 'Failed to fetch data'})
 
-        # Fetch daily aggregates (OHLC) for the previous trading day
-        # You might need to adjust the 'from_' and 'to' dates to ensure you're fetching the correct previous trading day
-        prev_day_ohlc = client.get_aggs(symbol, 1, "day", "2023-01-01", "2023-01-02")  # Example dates, adjust accordingly
+    return stock_data
 
-        # Fetch the last trade
-        last_trade = client.get_last_trade(symbol)
-
-        # Fetch the last quote
-        last_quote = client.get_last_quote(symbol)
-
-        # Construct the result dictionary with the required information
-        result = {
-            'symbol': symbol,
-            'previous_close': prev_day_ohlc[0].close if prev_day_ohlc else None,  # Adjust according to actual response structure
-            'last_trade_price': last_trade.price if last_trade else None,
-            'last_ask_price': last_quote.ask_price if last_quote else None,  # Adjust field name according to actual response
-            'success': True
-        }
-    except Exception as e:
-        result = {
-            'symbol': symbol,
-            'error': str(e),
-            'success': False
-        }
-    finally:
-        # Clean up the client resource
-
-
-        return result
 
 
 def fetch_stock_data_with_retry(symbol, api_key, retries=3, backoff_factor=0.3):
     for attempt in range(retries):
         try:
-            return fetch_stock_data(symbol, api_key)
+            return fetch_multiple_stocks_data(symbol, api_key)
         except requests.exceptions.HTTPError as e:
             if e.response.status_code == 429:
                 sleep_time = backoff_factor * (2 ** attempt)

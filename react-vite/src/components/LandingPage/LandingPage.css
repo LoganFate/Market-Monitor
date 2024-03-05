@@ -17,25 +17,26 @@
     margin-bottom: 2em;
 }
 
-.about-section button {
+.signup-button {
     background-color: #0c8446; /* blue color for the button */
     color: white;
     border: none;
     padding: 1em 1.5em;
-    font-size: 1em;
+    font-size: 1.15em;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    text-decoration: none;
 }
 
-.about-section button:hover {
+.signup-button:hover {
     background-color: #093c13; /* darker blue color on hover */
 }
 
 .features-section {
     display: flex;
     justify-content: space-evenly;
-    padding: 50px 20px;
+    padding: 25px 20px;
     flex-wrap: wrap; /* ensures responsiveness */
 }
 

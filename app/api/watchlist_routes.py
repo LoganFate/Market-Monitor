@@ -48,7 +48,8 @@ def view_watchlist():
 
         if watchlist_entry.stock:
             stocks_data.append({
-                "id": watchlist_entry.stock.id,
+                "id": watchlist_entry.id,
+                "stock_id": watchlist_entry.stock.id,
                 "symbol": watchlist_entry.stock.symbol,
                 "name": watchlist_entry.stock.name,
                 "price": watchlist_entry.stock.price,

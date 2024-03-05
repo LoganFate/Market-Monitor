@@ -10,6 +10,8 @@ function SignupFormModal() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [aboutMe, setAboutMe] = useState("");
+  const [profilePic, setProfilePic] = useState("");
   const [errors, setErrors] = useState({});
   const { closeModal } = useModal();
 
@@ -28,6 +30,8 @@ function SignupFormModal() {
         email,
         username,
         password,
+        user_about: aboutMe,
+        profile_pic: profilePic,
       })
     );
 
@@ -39,7 +43,7 @@ function SignupFormModal() {
   };
 
   return (
-    <>
+    <div className="modal-signup-form">
       <h1>Sign Up</h1>
       {errors.server && <p>{errors.server}</p>}
       <form onSubmit={handleSubmit}>
@@ -83,9 +87,29 @@ function SignupFormModal() {
           />
         </label>
         {errors.confirmPassword && <p>{errors.confirmPassword}</p>}
+        <label>
+          About Me:
+          <textarea
+            value={aboutMe}
+            onChange={(e) => setAboutMe(e.target.value)}
+            required
+          />
+        </label>
+        {errors.user_about && <p className="error">{errors.user_about}</p>}
+
+        <label>
+          Profile Picture URL:
+          <input
+            type="text"
+            value={profilePic}
+            onChange={(e) => setProfilePic(e.target.value)}
+          />
+        </label>
+        {errors.profilePic && <p className="error">{errors.profilePic}</p>}
+
         <button type="submit">Sign Up</button>
       </form>
-    </>
+    </div>
   );
 }
 
