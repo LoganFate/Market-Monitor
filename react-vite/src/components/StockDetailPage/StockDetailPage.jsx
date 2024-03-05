@@ -68,8 +68,15 @@ const StockDetailPage = () => {
             // Only send messages after the connection is open
             websocket.send(JSON.stringify({ action: "auth", params: 'unLg31iXhM99E5yWodIRsOe3pugcBLnl' }));
             websocket.send(JSON.stringify({ action: "subscribe", params: `A.${stockSymbol}` }));
-        };
+            const pingInterval = setInterval(() => {
+                if (websocket.readyState === WebSocket.OPEN) {
+                    websocket.send(JSON.stringify({ action: "ping" }));
+                }
+            }, 1000);
 
+            // Make sure to clear the interval when the websocket closes
+            websocket.onclose = () => clearInterval(pingInterval);
+        };
         websocket.onmessage = (event) => {
             console.log('WebSocket message received:', event.data);
             const messages = JSON.parse(event.data);
