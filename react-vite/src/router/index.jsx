@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import LandingPage from '../components/LandingPage';
 import HomePage from '../components/HomePage'
 import StockDetailPage from '../components/StockDetailPage';
+import ProfilePage from '../components/ProfilePage'
 import Layout from './Layout';
 
 
@@ -20,6 +21,10 @@ export const router = createBrowserRouter([
       {
         path: "/stock/:stockSymbol",
         element: <StockDetailPage />
+      },
+      {
+        path: "/profile",
+        element: <ProfilePage />
       }
     ],
   },

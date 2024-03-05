@@ -34,7 +34,7 @@ const StockDetailPage = () => {
                 },
                 priceScale: {
                     scaleMargins: {
-                        top: 0.5,
+                        top: 0.1,
                         bottom: 0.25,
                     },
                     borderVisible: false,
