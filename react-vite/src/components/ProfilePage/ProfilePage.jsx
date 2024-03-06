@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 // import { useParams } from 'react-router-dom';
+import './ProfilePage.css'
 
 
 const ProfilePage = () => {
@@ -46,32 +47,33 @@ const ProfilePage = () => {
   }
 
   return (
-    <div>
-    <div>
-      <h1>User Profile</h1>
-      <p>Name: {profileData.name}</p>
-      <p> Username: {profileData.username}</p>
-      <p>Email: {profileData.email}</p>
-      <p>About: {profileData.user_about}</p>
-      <p>Profile Pic: {profileData.profile_pic}</p>
-      {/* Add more profile data as needed */}
-    </div>
-    {/* Planner Entries Section */}
-<div>
-  <h2>Planner Entries</h2>
-  {plannerEntries.length > 0 ? (
-    plannerEntries.map(entry => (
-      <div key={entry.id}>
-        <h3>{entry.category}</h3>
-        <p>{entry.text}</p>
-        {/* Format the date as needed */}
-        <p>Created At: {entry.created_at}</p>
-      </div>
-    ))
-  ) : (
-    <p>No planner entries found.</p>
-  )}
-</div>
+    <div className="profile-page">
+    <header className="profile-header">
+        <h1>User Profile</h1>
+    </header>
+    <section className="profile-info">
+        <div className="profile-details">
+            <p><span className="detail-label">Name:</span> {profileData.name}</p>
+            <p><span className="detail-label">Username:</span> {profileData.username}</p>
+            <p><span className="detail-label">Email:</span> {profileData.email}</p>
+            <p><span className="detail-label">About:</span> {profileData.user_about}</p>
+            <p><span className="detail-label">Profile Pic:</span> <img src={profileData.profile_pic} alt="Profile" /></p>
+        </div>
+    </section>
+    <section className="planner-entries">
+        <h2>Planner Entries</h2>
+        {plannerEntries.length > 0 ? (
+            plannerEntries.map(entry => (
+                <div key={entry.id} className="planner-entry">
+                    <h3>{entry.category}</h3>
+                    <p>{entry.text}</p>
+                    <p><span className="detail-label">Created At:</span> {entry.created_at}</p>
+                </div>
+            ))
+        ) : (
+            <p>No planner entries found.</p>
+        )}
+    </section>
 </div>
   );
 };

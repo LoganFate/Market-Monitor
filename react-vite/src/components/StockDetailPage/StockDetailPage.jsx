@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
 import { createChart, CrosshairMode } from 'lightweight-charts';
 import 'chart.js/auto';
-
+import './StockDetail.css'
 
 const StockDetailPage = () => {
     const { stockSymbol } = useParams();
@@ -13,6 +13,7 @@ const StockDetailPage = () => {
     const [ws, setWs] = useState(null);
     const [chart, setChart] = useState(null);
     const [series, setSeries] = useState(null);
+    const [articles, setArticles] = useState([]);
 
     useEffect(() => {
         // Initialize the chart only once
@@ -109,6 +110,8 @@ const StockDetailPage = () => {
             });
         };
 
+
+
         // This cleanup function belongs to the useEffect and ensures WebSocket is closed when component unmounts or stockSymbol changes
         return () => {
             if (websocket.readyState === WebSocket.OPEN) {
@@ -128,22 +131,55 @@ const StockDetailPage = () => {
         }],
     };
 
+    useEffect(() => {
+        const fetchArticles = async () => {
+            const apiKey = 'unLg31iXhM99E5yWodIRsOe3pugcBLnl'; // Replace with your Polygon API key
+            try {
+                const response = await fetch(`https://api.polygon.io/v2/reference/news?ticker=${stockSymbol}&order=desc&limit=5&apiKey=${apiKey}`);
+                if (!response.ok) throw new Error('Failed to fetch articles');
+                const data = await response.json();
+                setArticles(data.results);
+            } catch (error) {
+                console.error("Error fetching articles:", error);
+            }
+        };
+
+        fetchArticles();
+    }, [stockSymbol]); // Rerun this effect when stockSymbol changes
+
     return (
-        <div>
-            <h2>Stock Details for {stockSymbol}</h2>
-            <div>
-                <h3>Line Chart</h3>
-                {stockData.prices.length > 0 ? (
+        <div className="container">
+    <h2 className="heading">Stock Details for {stockSymbol}</h2>
+    <div className="charts-container">
+    <div className="chart-container">
+        <h3>Line Chart</h3>
+        {stockData.prices.length > 0 ? (
                     <Line data={lineChartData} />
                 ) : (
                     <p>No line chart data available.</p>
                 )}
-            </div>
-            <div>
-                <h3>Candlestick Chart</h3>
-                <div ref={chartContainerRef} style={{ width: '600px', height: '300px' }}></div>
-            </div>
-        </div>
+    </div>
+    <div className="chart-container">
+        <h3>Candlestick Chart</h3>
+        <div ref={chartContainerRef} className="chart" style={{ width: '600px', height: '300px' }}></div>
+    </div>
+    </div>
+    <div className="articles-container">
+        <h2 className="heading">Latest Articles for {stockSymbol}</h2>
+        <ul className="list">
+            {articles.map(article => (
+                <li key={article.id} className="list-item">
+                    <div className="article-info">
+                        {/* Include image if available */}
+                        <img src={article.image_url} alt={article.title} />
+                        <a href={article.article_url} target="_blank" rel="noopener noreferrer">{article.title}</a>
+                    </div>
+                </li>
+            ))}
+        </ul>
+    </div>
+</div>
+
     );
 };
 
