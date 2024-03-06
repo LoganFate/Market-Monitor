@@ -19,6 +19,10 @@ from .seeds import seed_commands
 from .config import Config
 
 app = Flask(__name__, static_folder='../react-vite/dist', static_url_path='/')
+cors = CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
+CORS(app, supports_credentials=True)
+
+
 
 # Setup login manager
 login = LoginManager(app)
@@ -50,8 +54,7 @@ app.register_blueprint(planner_routes, url_prefix='/api/planner')
 db.init_app(app)
 Migrate(app, db)
 
-# Application Security
-CORS(app)
+# Application Secur
 
 
 # Since we are deploying with Docker and Flask,
@@ -76,7 +79,7 @@ def inject_csrf_token(response):
         secure=True if os.environ.get('FLASK_ENV') == 'production' else False,
         samesite='Strict' if os.environ.get(
             'FLASK_ENV') == 'production' else None,
-        httponly=True)
+        httponly=False)
     return response
 
 

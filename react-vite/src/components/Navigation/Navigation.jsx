@@ -50,7 +50,7 @@ function Navigation() {
           <>
           <button onClick={() => navigate("/home")} className="button">Home</button>
              <button onClick={() => navigate("/profile")} className="button">Profile</button>
-
+             <button onClick={() => navigate("/watchlist")} className="button">Watchlist</button>
             <button onClick={handleLogout} className="button">Logout</button>
           </>
         )}

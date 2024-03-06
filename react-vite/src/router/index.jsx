@@ -3,6 +3,7 @@ import LandingPage from '../components/LandingPage';
 import HomePage from '../components/HomePage'
 import StockDetailPage from '../components/StockDetailPage';
 import ProfilePage from '../components/ProfilePage'
+import WatchlistPage from '../components/WatchlistPage';
 import Layout from './Layout';
 
 
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
       {
         path: "/profile",
         element: <ProfilePage />
+      },
+      {
+        path: "/watchlist",
+        element: <WatchlistPage />
       }
     ],
   },

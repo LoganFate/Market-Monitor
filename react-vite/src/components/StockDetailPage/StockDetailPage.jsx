@@ -7,8 +7,8 @@ import './StockDetail.css'
 
 const StockDetailPage = () => {
     const { stockSymbol } = useParams();
-    const lineChartContainerRef = useRef(null); // Ref for the line chart container if needed
-    const chartContainerRef = useRef(null); // Ref for the Lightweight Chart container
+    const lineChartContainerRef = useRef(null);
+    const chartContainerRef = useRef(null);
     const [stockData, setStockData] = useState({ prices: [], timestamps: [], candlestickData: [] });
     const [ws, setWs] = useState(null);
     const [chart, setChart] = useState(null);
@@ -84,7 +84,7 @@ const StockDetailPage = () => {
 
             messages.forEach(message => {
                 if (message.ev && message.ev === 'A') {
-                    const newTimestamp = Math.floor(new Date(message.s).getTime() / 1000); // Lightweight Charts uses UNIX timestamp in seconds
+                    const newTimestamp = Math.floor(new Date(message.s).getTime() / 1000);
                     const newCandlestickData = {
                         time: newTimestamp,
                         open: message.o,
@@ -93,7 +93,7 @@ const StockDetailPage = () => {
                         close: message.c,
                     };
 
-                    // Update the React state for prices and timestamps
+
                     setStockData(prevData => ({
                         ...prevData,
                         prices: [...prevData.prices, message.c].slice(-60),
@@ -112,15 +112,15 @@ const StockDetailPage = () => {
 
 
 
-        // This cleanup function belongs to the useEffect and ensures WebSocket is closed when component unmounts or stockSymbol changes
+
         return () => {
             if (websocket.readyState === WebSocket.OPEN) {
                 websocket.send(JSON.stringify({ action: "unsubscribe", params: `A.${stockSymbol}` }));
                 websocket.close();
             }
         };
-    }, [stockSymbol, series]); // Add `series` to useEffect dependencies to ensure it captures the latest series instance.
-    // Line chart data setup
+    }, [stockSymbol, series]);
+
     const lineChartData = {
         labels: stockData.timestamps,
         datasets: [{
@@ -147,6 +147,49 @@ const StockDetailPage = () => {
         fetchArticles();
     }, [stockSymbol]); // Rerun this effect when stockSymbol changes
 
+
+
+      // Function to add stock to watchlist
+      async function addToWatchlist(stockSymbol, category = 'default') {
+        try {
+            function getCSRFToken() {
+                const cookieString = document.cookie;
+                console.log('Cookie string:', cookieString);
+                if (cookieString) {
+                    const cookies = cookieString.split('; ');
+                    for (const cookie of cookies) {
+                        const [name, value] = cookie.split('=');
+                        if (name.trim() === 'csrf_token') {
+                            console.log('CSRF token:', value);
+                            return value;
+                        }
+                    }
+                }
+                return null;
+            }
+
+            const csrfToken = getCSRFToken();
+
+            if (!csrfToken) {
+                throw new Error('CSRF token not found');
+            }
+
+            await fetch("/api/watchlist", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    stock_id: stockSymbol,
+                    category: category
+                })
+            });
+
+        } catch (error) {
+            console.error('Error adding to watchlist:', error);
+        }
+    }
     return (
         <div className="container">
     <h2 className="heading">Stock Details for {stockSymbol}</h2>
@@ -162,6 +205,7 @@ const StockDetailPage = () => {
     <div className="chart-container">
         <h3>Candlestick Chart</h3>
         <div ref={chartContainerRef} className="chart" style={{ width: '600px', height: '300px' }}></div>
+        <button onClick={() => addToWatchlist(stockSymbol)}>Add to Watchlist</button>
     </div>
     </div>
     <div className="articles-container">
