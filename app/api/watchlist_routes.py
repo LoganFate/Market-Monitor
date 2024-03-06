@@ -43,30 +43,30 @@ def add_stock_to_watchlist():
 @watchlist_routes.route('/', methods=['GET'])
 @login_required
 def view_watchlist():
+    watchlist_items = Watchlist.query.filter_by(user_id=current_user.id).all()
     stocks_data = []
-    for watchlist_entry in current_user.watchlist_stocks:
+    for item in watchlist_items:
 
-        if watchlist_entry.stock:
+       stock = item.stock
+       if stock:
             stocks_data.append({
-                "id": watchlist_entry.id,
-                "stock_id": watchlist_entry.stock.id,
-                "symbol": watchlist_entry.stock.symbol,
-                "name": watchlist_entry.stock.name,
-                "price": watchlist_entry.stock.price,
-                "category": watchlist_entry.stock.category
+                "id": item.id,
+                "stock_id": stock.id,
+                "symbol": stock.symbol,
+                "name": stock.name,
+                "price": stock.price,
+                "category": stock.category
                 # add additional categories
             })
-        else:
-            print(f"Watchlist entry {watchlist_entry.id} has no associated stock.")
 
     return jsonify(stocks_data), 200
 
-def update_category(user_id, stock_id, new_category):
-    sql = text("""
-        UPDATE watchlist SET category=:category
-        WHERE user_id=:user_id AND stock_id=:stock_id
-    """)
-    db.engine.execute(sql, category=new_category, user_id=user_id, stock_id=stock_id)
+# def update_category(user_id, stock_id, new_category):
+#     sql = text("""
+#         UPDATE watchlist SET category=:category
+#         WHERE user_id=:user_id AND stock_id=:stock_id
+#     """)
+#     db.engine.execute(sql, category=new_category, user_id=user_id, stock_id=stock_id)
 
 
 @watchlist_routes.route('/', methods=['PUT'])

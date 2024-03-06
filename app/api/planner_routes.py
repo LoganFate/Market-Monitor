@@ -26,7 +26,7 @@ def add_plan():
     db.session.add(new_plan)
     db.session.commit()
 
-    return jsonify({"message": "Plan added successfully"}), 201
+    return jsonify(new_plan.to_dict()), 201
 
 @planner_routes.route('', methods=['GET'])
 @login_required
@@ -58,9 +58,11 @@ def update_plan(plan_id):
     if plan_text:
         plan.text = plan_text
 
+
+
     db.session.commit()
 
-    return jsonify({"message": "Plan updated successfully"}), 200
+    return jsonify(plan.to_dict()), 200
 
 @planner_routes.route('/<int:plan_id>', methods=['DELETE'])
 @login_required
