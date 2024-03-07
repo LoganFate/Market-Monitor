@@ -14,6 +14,11 @@ const StockDetailPage = () => {
     const [chart, setChart] = useState(null);
     const [series, setSeries] = useState(null);
     const [articles, setArticles] = useState([]);
+    const [commentText, setCommentText] = useState('');
+    const [articleIdForComment, setArticleIdForComment] = useState(null);
+    const [commentsByArticleId, setCommentsByArticleId] = useState({});
+    const [editingComment, setEditingComment] = useState({ id: null, text: "" });
+
 
     useEffect(() => {
         // Initialize the chart only once
@@ -139,10 +144,21 @@ const StockDetailPage = () => {
                 if (!response.ok) throw new Error('Failed to fetch articles');
                 const data = await response.json();
                 setArticles(data.results);
+                const comments = {};
+                for (const article of data.results) {
+                    const commentsResponse = await fetch(`/api/comments/article/${article.id}`);
+                    if (commentsResponse.ok) {
+                        comments[article.id] = await commentsResponse.json();
+                    } else {
+                        comments[article.id] = []; // Ensure we always have an array for each article
+                    }
+                }
+                setCommentsByArticleId(comments);
             } catch (error) {
-                console.error("Error fetching articles:", error);
+                console.error("Error:", error);
             }
         };
+
 
         fetchArticles();
     }, [stockSymbol]); // Rerun this effect when stockSymbol changes
@@ -190,6 +206,66 @@ const StockDetailPage = () => {
             console.error('Error adding to watchlist:', error);
         }
     }
+
+    const handleAddComment = async (e) => {
+        e.preventDefault();
+
+        const commentPayload = {
+            article_id: articleIdForComment,
+            comment_text: commentText,
+        };
+
+        const url = editingComment.id ? `/api/comments/${editingComment.id}` : '/api/comments';
+        const method = editingComment.id ? 'PUT' : 'POST';
+
+        if (!articleIdForComment) {
+            console.error('Article ID for commenting is not set.');
+            return;
+        }
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(commentPayload),
+            });
+            if (!response.ok) throw new Error('Network response was not ok.');
+
+            const returnedComment = await response.json();
+
+            // Update local state to reflect the new or updated comment
+            if (editingComment.id) {
+                // If editing, update the specific comment in commentsByArticleId
+                setCommentsByArticleId(prev => ({
+                    ...prev,
+                    [articleIdForComment]: prev[articleIdForComment].map(c => c.id === editingComment.id ? returnedComment : c),
+                }));
+            } else {
+                // If adding, append the new comment to the list of comments for the article
+                setCommentsByArticleId(prev => ({
+                    ...prev,
+                    [articleIdForComment]: [...(prev[articleIdForComment] || []), returnedComment],
+                }));
+            }
+
+            // Reset form and editing state
+            setCommentText('');
+            setEditingComment({ id: null, text: "" });
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    const startEditComment = (articleId, comment) => {
+        setArticleIdForComment(articleId);
+        setEditingComment({ id: comment.id, text: comment.text });
+        setCommentText(comment.text);
+    };
+
+
+
     return (
         <div className="container">
     <h2 className="heading">Stock Details for {stockSymbol}</h2>
@@ -217,9 +293,30 @@ const StockDetailPage = () => {
                         {/* Include image if available */}
                         <img src={article.image_url} alt={article.title} />
                         <a href={article.article_url} target="_blank" rel="noopener noreferrer">{article.title}</a>
-                    </div>
+                        <button onClick={() => setArticleIdForComment(article.id)}>Add Comment</button>
+                        {articleIdForComment === article.id && (
+                                     <form onSubmit={handleAddComment} style={{ marginTop: '20px' }}>
+                                     <textarea
+                                         value={commentText}
+                                         onChange={(e) => setCommentText(e.target.value)}
+                                         placeholder="Write your comment here"
+                                         style={{ display: 'block', width: '100%', marginBottom: '10px' }}
+                                     />
+                                    <button type="submit">{editingComment.id ? 'Update Comment' : 'Submit Comment'}</button>
+                                 </form>
+                                )}
+                                 <div className="comments">
+                                 {commentsByArticleId[article.id] && commentsByArticleId[article.id].map(comment => (
+    <div key={comment.id}>
+        <p>{comment.text}</p>
+        <button onClick={() => startEditComment(article.id, comment)}>Edit</button>
+    </div>
+))}
+            </div>
+                </div>
                 </li>
             ))}
+
         </ul>
     </div>
 </div>
