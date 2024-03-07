@@ -1,25 +1,106 @@
-import { useEffect, useState, useRef } from 'react';
-import { createChart } from 'lightweight-charts';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { createChart, CrosshairMode } from 'lightweight-charts';
 
 const WatchlistPage = () => {
 
     const [watchlist, setWatchlist] = useState([]);
 
-    const chartContainersRefs = useRef({});
     const webSocketRefs = useRef({});
+    const chartRefs = useRef({});
 
     useEffect(() => {
         fetchWatchlist();
-        // Cleanup WebSockets on component unmount
         return () => {
             Object.values(webSocketRefs.current).forEach(ws => ws && ws.close());
         };
     }, []);
 
+    useEffect(() => {
+        watchlist.forEach(stock => {
+            if (!chartRefs.current[stock.symbol]) {
+                initChart(stock.symbol);
+            }
+        });
+    }, [watchlist]);// Re-run when watchlist changes
+
+    const fetchCandlestickData = useCallback((symbol, candleSeries) => {
+        const ws = new WebSocket('wss://delayed.polygon.io/stocks');
+        webSocketRefs.current[symbol] = ws;
+
+
+        ws.onopen = () => {
+            console.log('WebSocket Connected');
+            ws.send(JSON.stringify({ action: "auth", params: 'unLg31iXhM99E5yWodIRsOe3pugcBLnl' }));
+            ws.send(JSON.stringify({ action: "subscribe", params: `A.${symbol}` }));
+        };
+
+        ws.onmessage = (event) => {
+            console.log('WebSocket message received:', event.data);
+            const messages = JSON.parse(event.data);
+
+            messages.forEach(message => {
+                if (message.ev && message.ev === 'A') { // Check for the correct event type for data messages
+                    // We'll assume 'data.s' is the timestamp in an acceptable format
+                    const newTimestamp = Math.floor(new Date(message.s).getTime() / 1000);
+                    const newCandlestickData = {
+                        time: newTimestamp,
+                        open: message.o,
+                        high: message.h,
+                        low: message.l,
+                        close: message.c,
+                    };
+                    candleSeries.update(newCandlestickData); // Update the chart with the new data
+            }
+        })
+    }
+        ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+
+        ws.onclose = () => {
+            console.log('WebSocket disconnected');
+        };
+    });
+
+    const initChart = useCallback((symbol) => {
+        const chartContainer = document.getElementById(`chart-container-${symbol}`);
+        if (chartContainer) {
+            const chart = createChart(chartContainer, {
+                width: chartContainer.offsetWidth,
+                height: 300,
+                layout: {
+                    backgroundColor: '#FFFFFF',
+                    textColor: '#333',
+                },
+                grid: {
+                    vertLines: {
+                        color: '#ECECEC',
+                    },
+                    horzLines: {
+                        color: '#ECECEC',
+                    },
+                },
+                priceScale: {
+                    borderVisible: false,
+                },
+                timeScale: {
+                    borderVisible: false,
+                },
+                crosshair: {
+                    mode: CrosshairMode.Normal,
+                },
+            });
+            const candleSeries = chart.addCandlestickSeries();
+            chartRefs.current[symbol] = chart; // Store the chart instance
+            fetchCandlestickData(symbol, candleSeries);
+        }
+    }, [fetchCandlestickData]);
+
+
 
     const fetchWatchlist = async () => {
         try {
-            const response = await fetch('/api/watchlist', {
+            const response = await fetch('/api/watchlist/', {
                 method: 'GET',
                 credentials: 'include'
             });
@@ -53,86 +134,32 @@ const WatchlistPage = () => {
     };
 
 
-    useEffect(() => {
-        watchlist.forEach(stock => {
-            if (stock.symbol && !chartContainersRefs.current[stock.symbol]) {
-                // Initialize chart for each stock
-                initChart(stock.symbol);
-            }
-        });
-    }, [watchlist]);
-
-    const initChart = (symbol) => {
-        // Dynamically create chart container if not already created
-        if (!document.getElementById(`chart-container-${symbol}`)) {
-            const chartContainer = document.createElement('div');
-            chartContainer.id = `chart-container-${symbol}`;
-            chartContainer.style.height = '300px';
-            document.body.appendChild(chartContainer);
-
-            const chart = createChart(chartContainer, {
-                width: chartContainer.offsetWidth,
-                height: 300,
-            });
-            const candleSeries = chart.addCandlestickSeries();
+    // useEffect(() => {
+    //     watchlist.forEach(stock => {
+    //         if (stock.symbol && !chartContainersRefs.current[stock.symbol]) {
+    //             // Initialize chart for each stock
+    //             initChart(stock.symbol);
+    //         }
+    //     });
+    // }, [watchlist, initChart]);
 
 
-            chartContainersRefs.current[symbol] = chartContainer;
-
-
-            fetchCandlestickData(symbol, candleSeries);
-        }
-    };
-
-    const fetchCandlestickData = (symbol, candleSeries) => {
-        const ws = new WebSocket('wss://delayed.polygon.io/stocks');
-        webSocketRefs.current[symbol] = ws;
-
-        ws.onopen = () => {
-            console.log('WebSocket Connected');
-            ws.send(JSON.stringify({ action: "auth", params: 'unLg31iXhM99E5yWodIRsOe3pugcBLnl' }));
-            ws.send(JSON.stringify({ action: "subscribe", params: `A.${stockSymbol}` }));
-        };
-
-        ws.onmessage = (event) => {
-            console.log('WebSocket message received:', event.data);
-            const data = JSON.parse(event.data);
-
-            const candlestickData = {
-                time: '2024-03-06',
-                open: data.open,
-                high: data.high,
-                low: data.low,
-                close: data.close,
-            };
-            candleSeries.update(candlestickData);
-        };
-
-        ws.onerror = (error) => {
-            console.error('WebSocket error:', error);
-        };
-
-        ws.onclose = () => {
-            console.log('WebSocket disconnected');
-        };
-    };
 
 
     return (
         <div>
             <h2>My Watchlist</h2>
             {watchlist.map((stock, index) => (
-                <div key={index}>
+                <div key={stock.symbol}>
                     <h3>{`Stock ${index + 1}: ${stock.symbol}`}</h3>
                     <p>Symbol: {stock.symbol}</p>
                     <p>Name: {stock.name}</p>
                     <p>Price: {stock.price}</p>
-
                     <div id={`chart-container-${stock.symbol}`} style={{ height: '300px' }}></div>
                 </div>
             ))}
         </div>
     );
-            };
+};
 
 export default WatchlistPage;
