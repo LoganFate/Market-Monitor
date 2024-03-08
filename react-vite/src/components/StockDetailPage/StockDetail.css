@@ -40,6 +40,12 @@ body {
     align-items: center;
 }
 
+.line-chart-container {
+    width: 100%;
+    max-width: 600px; /* Ensures the width does not exceed 600px */
+    height: 300px; /* Set the height to 300px */
+  }
+
 .stock-info img, .article-info img {
     width: 50px;
     height: 50px;
@@ -47,10 +53,17 @@ body {
     border-radius: 50%;
 }
 
-/* Chart Container */
-.chart-container {
-    margin: 30px 0;
-}
+.charts-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start; /* Aligns items at the start of the container */
+  }
+
+  .chart-container {
+    flex: 1; /* Each chart container will take equal width */
+    padding: 10px; /* Optional: Adds some space inside each chart container */
+    box-sizing: border-box; /* Ensures padding is included in the width calculation */
+  }
 
 /* Additional Styles */
 /* Add more specific styles as needed, such as for buttons, inputs, or different state visuals (hover, active, etc.) */
@@ -63,6 +76,7 @@ body {
 .heading {
     text-align: center;
     margin-bottom: 20px;
+    color: #0a6e2b;
 }
 
 .charts-container {
@@ -80,18 +94,34 @@ body {
     height: 300px; /* Adjust height as needed */
 }
 
-.articles-container {
+.articles-container .list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Creates 3 columns */
+    gap: 20px; /* Adjust the gap between grid items */
     margin-top: 20px;
 }
 
-.list {
-    list-style: none;
-    padding: 0;
+.list-item {
+    background-color: #f9f9f9; /* Light background */
+    border: 1px solid #eaeaea; /* Light border */
+    border-radius: 5px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.list-item img {
+    max-width: auto;
+    height:auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+.list-item a {
+    color: #0a6e2b; /* Blue */
+    text-decoration: none;
+    margin-bottom: 10px;
 }
 
-.list-item {
-    margin-bottom: 15px;
-}
 
 .article-info {
     display: flex;
@@ -103,4 +133,18 @@ body {
     width: 50px; /* Adjust article image size here */
     height: auto;
     border-radius: 4px; /* Optional: for rounded corners */
+}
+button {
+    background-color: #1a7f56; /* Blue */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3; /* Darker blue */
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 // import { useParams } from 'react-router-dom';
 import './ProfilePage.css'
+import { useModal } from '../../context/Modal';
 
 
 const ProfilePage = () => {
@@ -11,6 +12,9 @@ const ProfilePage = () => {
   const [newPlan, setNewPlan] = useState({ planner_category: '', plan_text: '' });
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingPlanId, setEditingPlanId] = useState(null);
+  const { setModalContent, closeModal } = useModal();
+  const [formErrors, setFormErrors] = useState({});
+
 
   useEffect(() => {
     // Replace with actual data fetching logic
@@ -52,6 +56,22 @@ const ProfilePage = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+
+    setFormErrors({});
+
+    let errors = {};
+    if (newPlan.planner_category.length > 50) {
+      errors.planner_category = "Category name is too long (max 50 characters).";
+    }
+    if (newPlan.plan_text.length > 500) {
+      errors.plan_text = "Plan description is too long (max 500 characters).";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
     const endpoint = isEditMode ? `/api/planner/${editingPlanId}` : '/api/planner';
     const method = isEditMode ? 'PUT' : 'POST';
     const body = JSON.stringify({
@@ -85,7 +105,18 @@ const ProfilePage = () => {
     }
   };
 
+  const requestDeleteConfirmation = (planId) => {
+    setModalContent(
+      <div>
+        <p>Are you sure you want to delete this plan?</p>
+        <button onClick={() => handleDeletePlan(planId)}>Confirm</button>
+        <button onClick={closeModal}>Cancel</button>
+      </div>
+    );
+  };
+
   const handleDeletePlan = async (planId) => {
+    closeModal();
     try {
       const response = await fetch(`/api/planner/${planId}`, {
         method: 'DELETE',
@@ -107,11 +138,20 @@ const ProfilePage = () => {
   };
 
   const resetFormAndExitEditMode = () => {
-    setNewPlan({ planner_category: '', plan_text: '' });
-    setIsEditMode(false);
-    setEditingPlanId(null);
-    setShowAddPlanForm(false);
+    setNewPlan({ planner_category: '', plan_text: '' }); // Clear form fields
+    setIsEditMode(false); // Reset edit mode
+    setEditingPlanId(null); // Clear editing ID
+    setShowAddPlanForm(false); // Hide form
+    setFormErrors({}); // Clear any form errors
   };
+
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    const month = date.getMonth() + 1; // getMonth() returns 0-11
+    const day = date.getDate();
+    const year = date.getFullYear();
+    return `${month}-${day}-${year}`;
+  }
 
   return (
     <div className="profile-page">
@@ -124,7 +164,6 @@ const ProfilePage = () => {
             <p><span className="detail-label">Username:</span> {profileData.username}</p>
             <p><span className="detail-label">Email:</span> {profileData.email}</p>
             <p><span className="detail-label">About:</span> {profileData.user_about}</p>
-            <p><span className="detail-label">Profile Pic:</span> <img src={profileData.profile_pic} alt="Profile" /></p>
         </div>
     </section>
     <section className="planner-entries">
@@ -134,10 +173,9 @@ const ProfilePage = () => {
                 <div key={entry.id} className="planner-entry">
                     <h3>{entry.category}</h3>
                     <p>{entry.text}</p>
-                    <button onClick={() => handleDeletePlan(entry.id)}>Delete</button>
+                    <button onClick={() => requestDeleteConfirmation(entry.id)}>Delete</button>
                     <button onClick={() => handleEditPlan(entry)}>Edit</button>
-
-                    <p><span className="detail-label">Created At:</span> {entry.created_at}</p>
+                    <p>{formatDate(entry.created_at)}</p>
                 </div>
             ))
         ) : (
@@ -152,13 +190,17 @@ const ProfilePage = () => {
       value={newPlan.planner_category}
       onChange={(e) => setNewPlan({ ...newPlan, planner_category: e.target.value })}
     />
+    {formErrors.planner_category && <p className="form-error">{formErrors.planner_category}</p>}
+
     <textarea
       placeholder="Plan Text"
       value={newPlan.plan_text}
       onChange={(e) => setNewPlan({ ...newPlan, plan_text: e.target.value })}
     />
-    <button type="submit">Add Plan</button>
-    <button onClick={() => setShowAddPlanForm(false)}>Cancel</button>
+     {formErrors.plan_text && <p className="form-error">{formErrors.plan_text}</p>}
+
+     <button type="submit">{isEditMode ? 'Update Plan' : 'Add Plan'}</button>
+     <button onClick={resetFormAndExitEditMode}>Cancel</button>
   </form>
 )}
 <button onClick={() => setShowAddPlanForm(true)}>Add New Plan</button>

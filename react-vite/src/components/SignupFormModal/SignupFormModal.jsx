@@ -15,15 +15,33 @@ function SignupFormModal() {
   const [errors, setErrors] = useState({});
   const { closeModal } = useModal();
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!emailRegex.test(email)) {
+      newErrors.email = "Invalid email format.";
+    }
+    if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters long.";
+    }
+    if (password !== confirmPassword) {
+      newErrors.confirmPassword = "Confirm Password field must match the Password field.";
+    }
+    if (username.length < 3 || username.length > 20) {
+      newErrors.username = "Username must be between 3 and 20 characters long.";
+    }
+    if (aboutMe.length < 10 || aboutMe.length > 300) {
+      newErrors.user_about = "About Me must be between 10 and 300 characters long.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
-      return setErrors({
-        confirmPassword:
-          "Confirm Password field must be the same as the Password field",
-      });
-    }
+    if (!validateForm()) return;
 
     const serverResponse = await dispatch(
       thunkSignup({
@@ -31,7 +49,6 @@ function SignupFormModal() {
         username,
         password,
         user_about: aboutMe,
-        profile_pic: profilePic,
       })
     );
 
@@ -45,7 +62,7 @@ function SignupFormModal() {
   return (
     <div className="modal-signup-form">
       <h1>Sign Up</h1>
-      {errors.server && <p>{errors.server}</p>}
+      {errors.server && <p className="error">{errors.server}</p>}
       <form onSubmit={handleSubmit}>
         <label>
           Email
@@ -56,7 +73,7 @@ function SignupFormModal() {
             required
           />
         </label>
-        {errors.email && <p>{errors.email}</p>}
+        {errors.email && <p className="error">{errors.email}</p>}
         <label>
           Username
           <input
@@ -66,7 +83,7 @@ function SignupFormModal() {
             required
           />
         </label>
-        {errors.username && <p>{errors.username}</p>}
+        {errors.username && <p className="error">{errors.username}</p>}
         <label>
           Password
           <input
@@ -76,7 +93,7 @@ function SignupFormModal() {
             required
           />
         </label>
-        {errors.password && <p>{errors.password}</p>}
+        {errors.password && <p className="error">{errors.password}</p>}
         <label>
           Confirm Password
           <input
@@ -86,7 +103,7 @@ function SignupFormModal() {
             required
           />
         </label>
-        {errors.confirmPassword && <p>{errors.confirmPassword}</p>}
+        {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
         <label>
           About Me:
           <textarea
@@ -96,16 +113,6 @@ function SignupFormModal() {
           />
         </label>
         {errors.user_about && <p className="error">{errors.user_about}</p>}
-
-        <label>
-          Profile Picture URL:
-          <input
-            type="text"
-            value={profilePic}
-            onChange={(e) => setProfilePic(e.target.value)}
-          />
-        </label>
-        {errors.profilePic && <p className="error">{errors.profilePic}</p>}
 
         <button type="submit">Sign Up</button>
       </form>

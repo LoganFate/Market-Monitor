@@ -2,15 +2,14 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
 import { createChart, CrosshairMode } from 'lightweight-charts';
+import { useSelector } from 'react-redux';
 import 'chart.js/auto';
 import './StockDetail.css'
 
 const StockDetailPage = () => {
     const { stockSymbol } = useParams();
-    const lineChartContainerRef = useRef(null);
     const chartContainerRef = useRef(null);
     const [stockData, setStockData] = useState({ prices: [], timestamps: [], candlestickData: [] });
-    const [ws, setWs] = useState(null);
     const [chart, setChart] = useState(null);
     const [series, setSeries] = useState(null);
     const [articles, setArticles] = useState([]);
@@ -18,6 +17,55 @@ const StockDetailPage = () => {
     const [articleIdForComment, setArticleIdForComment] = useState(null);
     const [commentsByArticleId, setCommentsByArticleId] = useState({});
     const [editingComment, setEditingComment] = useState({ id: null, text: "" });
+    const currentUser = useSelector((state) => state.session.user);
+    const [historicalData, setHistoricalData] = useState({ prices: [], dates: [] });
+
+
+
+    useEffect(() => {
+        const fetchHistoricalData = async () => {
+          const endDate = new Date();
+          const startDate = new Date();
+          startDate.setDate(endDate.getDate() - 14); // Fetching data for the last 14 days
+
+          const from = startDate.toISOString().split('T')[0];
+          const to = endDate.toISOString().split('T')[0];
+          const url = `https://api.polygon.io/v2/aggs/ticker/${stockSymbol}/range/1/day/${from}/${to}?adjusted=true&sort=asc&apiKey=unLg31iXhM99E5yWodIRsOe3pugcBLnl`;
+
+          try {
+            const response = await fetch(url);
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            const prices = data.results.map(d => d.c);
+            const dates = data.results.map(d => new Date(d.t).toISOString().split('T')[0]);
+
+            setHistoricalData({
+              prices,
+              dates
+            });
+          } catch (error) {
+            console.error('Failed to fetch historical data:', error);
+          }
+        };
+
+        fetchHistoricalData();
+      }, [stockSymbol]); // Re-fetch when stockSymbol changes
+
+      // Data for the line chart
+      const lineChartData = {
+        labels: historicalData.dates,
+        datasets: [
+          {
+            label: `${stockSymbol} Closing Price`,
+            data: historicalData.prices,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+          }
+        ]
+      };
+
 
 
     useEffect(() => {
@@ -126,15 +174,7 @@ const StockDetailPage = () => {
         };
     }, [stockSymbol, series]);
 
-    const lineChartData = {
-        labels: stockData.timestamps,
-        datasets: [{
-            label: `${stockSymbol} Stock Price`,
-            data: stockData.prices,
-            borderColor: 'rgb(75, 192, 192)',
-            tension: 0.1,
-        }],
-    };
+
 
     useEffect(() => {
         const fetchArticles = async () => {
@@ -296,23 +336,30 @@ const StockDetailPage = () => {
         }
     };
 
+    const handleCancelEdit = () => {
 
+        // Proceed with canceling the edit as before
+        setEditingComment({ id: null, text: "" });
+        setCommentText('');
+        setArticleIdForComment(null); // Optional
+    };
 
     return (
         <div className="container">
     <h2 className="heading">Stock Details for {stockSymbol}</h2>
     <div className="charts-container">
     <div className="chart-container">
-        <h3>Line Chart</h3>
+
+        <div className="line-chart-container">
         {stockData.prices.length > 0 ? (
-                    <Line data={lineChartData} />
+                     <Line data={lineChartData} style={{ width: '500px', height: '300px' }}/>
                 ) : (
                     <p>No line chart data available.</p>
                 )}
     </div>
+    </div>
     <div className="chart-container">
-        <h3>Candlestick Chart</h3>
-        <div ref={chartContainerRef} className="chart" style={{ width: '600px', height: '300px' }}></div>
+        <div ref={chartContainerRef} className="chart" style={{ width: '400px', height: '250px' }}></div>
         <button onClick={() => addToWatchlist(stockSymbol)}>Add to Watchlist</button>
     </div>
     </div>
@@ -334,15 +381,20 @@ const StockDetailPage = () => {
                                          placeholder="Write your comment here"
                                          style={{ display: 'block', width: '100%', marginBottom: '10px' }}
                                      />
-                                    <button type="submit">{editingComment.id ? 'Update Comment' : 'Submit Comment'}</button>
+                                     <button type="submit">{editingComment.id ? 'Update Comment' : 'Submit Comment'}</button>
+    <button type="button" onClick={handleCancelEdit} style={{ marginLeft: '10px' }}>Cancel</button> {/* Add this line */}
                                  </form>
                                 )}
                                  <div className="comments">
                                  {commentsByArticleId[article.id] && commentsByArticleId[article.id].map((comment, index) => (
    <div key={`${comment.id}_${index}`}>
    <p>{comment.text}</p>
-   <button onClick={() => startEditComment(article.id, comment)}>Edit</button>
-   <button onClick={() => handleDeleteComment(article.id, comment.id)}>Delete</button>
+   {currentUser && currentUser.id === comment.user_id && (
+    <>
+        <button onClick={() => startEditComment(article.id, comment)}>Edit</button>
+        <button onClick={() => handleDeleteComment(article.id, comment.id)}>Delete</button>
+    </>
+)}
 </div>
 ))}
             </div>

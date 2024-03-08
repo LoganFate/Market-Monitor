@@ -25,6 +25,19 @@ function LoginFormModal() {
     }
   };
 
+  const handleDemoLogin = async () => {
+    const demoEmail = 'demo1@example.com';
+    const demoPassword = 'password1';
+
+    const serverResponse = await dispatch(thunkLogin({ email: demoEmail, password: demoPassword }))
+
+    if (!serverResponse) {
+      closeModal();
+      navigate('/home');
+    } else {
+      console.error("Demo Login Failed")
+  }
+};
 
   return (
 
@@ -56,6 +69,7 @@ function LoginFormModal() {
             {errors.password && <p className="error">{errors.password}</p>}
           </div>
           <button type="submit" className="login-button">Log In</button>
+          <button type="button" onClick={handleDemoLogin} className="login-button">Demo User Log In</button>
           <div className="form-footer">
             <p>
               Don&apos;t have an account? <a href="/signup">Create one</a>

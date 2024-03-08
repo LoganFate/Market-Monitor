@@ -16,20 +16,21 @@ body {
 
 /* Stock and Article List */
 .list {
-    list-style: none;
-    padding: 0;
-}
-
-.list-item {
-    background-color: #f4f4f4;
-    margin-bottom: 10px;
-    padding: 15px;
-    border-radius: 8px;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
 
+  .list-item {
+    /* This will allow each list item to take up 33.33% of the container's width,
+       and you will have 3 items per row as a result */
+    width: calc(33.33% - 20px); /* Adjust '20px' if you have set any padding or margin */
+    margin: 10px; /* This gives a little space between items */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: adds shadow for better visuals */
+    border-radius: 4px; /* Optional: rounds the corners */
+  }
 .list-item a {
     color: #007bff;
     text-decoration: none;
@@ -50,7 +51,26 @@ body {
 /* Chart Container */
 .chart-container {
     margin: 30px 0;
+    width: 100%;
 }
 
 /* Additional Styles */
 /* Add more specific styles as needed, such as for buttons, inputs, or different state visuals (hover, active, etc.) */
+@media (max-width: 768px) {
+    .list-item {
+      /* On smaller screens like tablets and phones, each list item will take full width */
+      width: 100%;
+    }
+  }
+
+  .article-info {
+    display: flex;
+    align-items: center; /* Centers items vertically */
+  }
+
+  .article-info img {
+    width: 50px; /* Or any size you prefer */
+    height: 50px; /* Maintain the same value as width for a square aspect ratio */
+    margin-right: 10px; /* Adds some space between the image and the text */
+    border-radius: 50%; /* Optional: if you want round images */
+  }
