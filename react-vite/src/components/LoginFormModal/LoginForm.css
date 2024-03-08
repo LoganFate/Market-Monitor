@@ -109,3 +109,13 @@
   color: red;
   margin-top: 5px;
 }
+
+.link-like-text {
+  color: rgb(25, 138, 64);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.link-like-text:hover {
+  text-decoration: none;
+}

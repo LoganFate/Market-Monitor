@@ -3,6 +3,7 @@ import { useState } from "react";
 import { thunkLogin } from "../../redux/session";
 import { useDispatch } from "react-redux";
 import { useModal } from "../../context/Modal";
+import SignupFormModal from '../SignupFormModal'
 import "./LoginForm.css";
 
 function LoginFormModal() {
@@ -11,6 +12,7 @@ function LoginFormModal() {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const { closeModal } = useModal();
+  const { setModalContent } = useModal();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -38,6 +40,12 @@ function LoginFormModal() {
       console.error("Demo Login Failed")
   }
 };
+
+ const handleCreateAccountClick = () => {
+  // Set the content of the modal to the SignupFormModal component
+  setModalContent(<SignupFormModal />);
+};
+
 
   return (
 
@@ -72,7 +80,9 @@ function LoginFormModal() {
           <button type="button" onClick={handleDemoLogin} className="login-button">Demo User Log In</button>
           <div className="form-footer">
             <p>
-              Don&apos;t have an account? <a href="/signup">Create one</a>
+              Don&apos;t have an account?  <span className="link-like-text" onClick={handleCreateAccountClick}>
+                Create one
+              </span>
             </p>
           </div>
         </form>
