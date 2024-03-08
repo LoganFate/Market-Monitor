@@ -9,13 +9,14 @@ class Article(db.Model):
         __table_args__ = {'schema': SCHEMA}
 
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String, primary_key=True)  # Assuming id from API is unique
     title = db.Column(db.String(255), nullable=False)
-    content = db.Column(db.Text, nullable=False)
+    content = db.Column(db.Text, nullable=False)  # You might want to map this to 'description' from the API data
     author = db.Column(db.String(100), nullable=True)
-    category = db.Column(db.String(50), nullable=True)
-    # Add other fields as necessary, such as publication_date, category, etc.
-
+    article_url = db.Column(db.String(255), nullable=True)
+    image_url = db.Column(db.String(255), nullable=True)
+    published_utc = db.Column(db.DateTime, nullable=True)
+    publisher = db.Column(db.JSON, nullable=True)
 
     def to_dict(self):
         return {
@@ -23,6 +24,8 @@ class Article(db.Model):
             'title': self.title,
             'content': self.content,
             'author': self.author,
-            'category': self.category
-            # Include other fields if necessary after integrating polygon API
+            'article_url': self.article_url,
+            'image_url': self.image_url,
+            'published_utc': self.published_utc.isoformat() if self.published_utc else None,
+            'publisher': self.publisher  # This will return the JSON object/dict as is
         }

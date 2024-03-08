@@ -143,10 +143,30 @@ const StockDetailPage = () => {
                 const response = await fetch(`https://api.polygon.io/v2/reference/news?ticker=${stockSymbol}&order=desc&limit=5&apiKey=${apiKey}`);
                 if (!response.ok) throw new Error('Failed to fetch articles');
                 const data = await response.json();
-                setArticles(data.results);
+
+                const saveResponse = await fetch('/api/articles/', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ articles: data.results }),
+                  });
+
+                   if (!saveResponse.ok) {
+                    const saveResponseData = await saveResponse.json(); // Parse JSON to access potential error messages
+                    throw new Error('Failed to save articles: ' + (saveResponseData.error || 'Unknown error'));
+                }
+
+                // After ensuring articles are saved (or already exist), fetch them from your backend or use the Polygon data directly
+                const savedArticlesData = await saveResponse.json(); // Assuming this returns the saved articles or a success message
+
+                // Depending on your backend, this could be the saved articles or you might need to fetch them again
+                console.log(savedArticlesData);
+                setArticles(data.results); // Or fetch again from your backend if necessary
+
                 const comments = {};
                 for (const article of data.results) {
-                    const commentsResponse = await fetch(`/api/comments/article/${article.id}`);
+                    const commentsResponse = await fetch(`/api/comments/${article.id}`);
                     if (commentsResponse.ok) {
                         comments[article.id] = await commentsResponse.json();
                     } else {
@@ -154,14 +174,14 @@ const StockDetailPage = () => {
                     }
                 }
                 setCommentsByArticleId(comments);
+
             } catch (error) {
                 console.error("Error:", error);
             }
         };
 
-
         fetchArticles();
-    }, [stockSymbol]); // Rerun this effect when stockSymbol changes
+    }, [stockSymbol]);
 
 
 
@@ -233,26 +253,22 @@ const StockDetailPage = () => {
             });
             if (!response.ok) throw new Error('Network response was not ok.');
 
-            const returnedComment = await response.json();
+            // Fetch the updated comments after submitting or updating a comment
+        const updatedCommentsResponse = await fetch(`/api/comments/${articleIdForComment}`);
+        if (!updatedCommentsResponse.ok) throw new Error('Failed to fetch updated comments.');
 
-            // Update local state to reflect the new or updated comment
-            if (editingComment.id) {
-                // If editing, update the specific comment in commentsByArticleId
-                setCommentsByArticleId(prev => ({
-                    ...prev,
-                    [articleIdForComment]: prev[articleIdForComment].map(c => c.id === editingComment.id ? returnedComment : c),
-                }));
-            } else {
-                // If adding, append the new comment to the list of comments for the article
-                setCommentsByArticleId(prev => ({
-                    ...prev,
-                    [articleIdForComment]: [...(prev[articleIdForComment] || []), returnedComment],
-                }));
-            }
+        const updatedComments = await updatedCommentsResponse.json();
+
+        // Update the local state with the fetched updated comments
+        setCommentsByArticleId(prev => ({
+            ...prev,
+            [articleIdForComment]: updatedComments,
+        }));
 
             // Reset form and editing state
             setCommentText('');
             setEditingComment({ id: null, text: "" });
+            setArticleIdForComment(null); // Reset articleIdForComment after submitting the comment
         } catch (error) {
             console.error('Error:', error);
         }
@@ -262,6 +278,22 @@ const StockDetailPage = () => {
         setArticleIdForComment(articleId);
         setEditingComment({ id: comment.id, text: comment.text });
         setCommentText(comment.text);
+    };
+    const handleDeleteComment = async (articleId, commentId) => {
+        try {
+            const response = await fetch(`/api/comments/${commentId}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) throw new Error('Network response was not ok.');
+
+            // Remove the deleted comment from the state
+            setCommentsByArticleId(prev => ({
+                ...prev,
+                [articleId]: prev[articleId].filter(comment => comment.id !== commentId),
+            }));
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
 
 
@@ -306,11 +338,12 @@ const StockDetailPage = () => {
                                  </form>
                                 )}
                                  <div className="comments">
-                                 {commentsByArticleId[article.id] && commentsByArticleId[article.id].map(comment => (
-    <div key={comment.id}>
-        <p>{comment.text}</p>
-        <button onClick={() => startEditComment(article.id, comment)}>Edit</button>
-    </div>
+                                 {commentsByArticleId[article.id] && commentsByArticleId[article.id].map((comment, index) => (
+   <div key={`${comment.id}_${index}`}>
+   <p>{comment.text}</p>
+   <button onClick={() => startEditComment(article.id, comment)}>Edit</button>
+   <button onClick={() => handleDeleteComment(article.id, comment.id)}>Delete</button>
+</div>
 ))}
             </div>
                 </div>
