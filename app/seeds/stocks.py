@@ -56,7 +56,48 @@ def seed_stocks():
             pe_ratio=110,
             sector='Consumer Discretionary',
             previous_close=699.60  # Example value
-        )
+        ),
+        Stock(
+    symbol='NVDA',
+    name='NVIDIA Corporation',
+    price=220.00,  # Example value
+    category='Technology',
+    market_cap=550000000000,  # Example value
+    pe_ratio=40,  # Example value
+    sector='Technology',
+    previous_close=219.00  # Example value
+),
+Stock(
+    symbol='INTC',
+    name='Intel Corporation',
+    price=50.00,  # Example value
+    category='Technology',
+    market_cap=200000000000,  # Example value
+    pe_ratio=12,  # Example value
+    sector='Technology',
+    previous_close=49.50  # Example value
+),
+Stock(
+    symbol='JPM',
+    name='JPMorgan Chase & Co.',
+    price=160.00,  # Example value
+    category='Financials',
+    market_cap=480000000000,  # Example value
+    pe_ratio=10,  # Example value
+    sector='Financials',
+    previous_close=159.00  # Example value
+),
+Stock(
+    symbol='JNJ',
+    name='Johnson & Johnson',
+    price=170.00,  # Example value
+    category='Healthcare',
+    market_cap=450000000000,  # Example value
+    pe_ratio=25,  # Example value
+    sector='Healthcare',
+    previous_close=169.00  # Example value
+)
+
     ]
 
     db.session.bulk_save_objects(stocks)

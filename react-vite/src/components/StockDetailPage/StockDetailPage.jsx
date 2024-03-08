@@ -352,7 +352,7 @@ const StockDetailPage = () => {
 
         <div className="line-chart-container">
         {stockData.prices.length > 0 ? (
-                     <Line data={lineChartData} style={{ width: '500px', height: '300px' }}/>
+                     <Line data={lineChartData} style={{ width: '400px', height: '300px' }}/>
                 ) : (
                     <p>No line chart data available.</p>
                 )}

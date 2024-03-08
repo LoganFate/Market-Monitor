@@ -6,7 +6,7 @@ body {
 .container {
     max-width: 1200px;
     margin: auto;
-    padding: 20px;
+    padding: 0px;
 }
 
 .heading {
@@ -23,15 +23,13 @@ body {
     list-style: none;
   }
 
-  .list-item {
-    /* This will allow each list item to take up 33.33% of the container's width,
-       and you will have 3 items per row as a result */
-    width: calc(33.33% - 20px); /* Adjust '20px' if you have set any padding or margin */
-    margin: 10px; /* This gives a little space between items */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: adds shadow for better visuals */
-    border-radius: 4px; /* Optional: rounds the corners */
+  .home-list-item {
+    width: calc(33.33% - 65px);
+    margin: 10px; /* Space between items */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 4px;
   }
-.list-item a {
+.home-list-item a {
     color: #007bff;
     text-decoration: none;
 }
@@ -74,3 +72,24 @@ body {
     margin-right: 10px; /* Adds some space between the image and the text */
     border-radius: 50%; /* Optional: if you want round images */
   }
+
+  .home-list-item {
+    background-color: #f9f9f9; /* Light background */
+    border: 1px solid #eaeaea; /* Light border */
+    border-radius: 5px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.home-list-item img {
+    max-width: auto;
+    height:auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+.home-list-item a {
+    color: #0a6e2b; /* Blue */
+    text-decoration: none;
+    margin-bottom: 10px;
+}

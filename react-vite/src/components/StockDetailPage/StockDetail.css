@@ -3,6 +3,7 @@ body {
     font-family: Arial, sans-serif;
 }
 
+
 .container {
     max-width: 1200px;
     margin: auto;
@@ -96,9 +97,9 @@ body {
 
 .articles-container .list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Creates 3 columns */
-    gap: 20px; /* Adjust the gap between grid items */
-    margin-top: 20px;
+    grid-template-columns: repeat(2, 1fr); /* Creates 3 columns */
+    gap: 10px; /* Adjust the gap between grid items */
+    margin-top: 10px;
 }
 
 .list-item {
@@ -108,11 +109,11 @@ body {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    /* align-items: center; */
 }
 .list-item img {
     max-width: auto;
-    height:auto;
+    height: auto;
     border-radius: 5px;
     margin-bottom: 10px;
 }
@@ -124,7 +125,9 @@ body {
 
 
 .article-info {
+    width: 100%;
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 10px; /* Adjust gap between image and text here */
 }
@@ -147,4 +150,80 @@ button {
 
 button:hover {
     background-color: #0056b3; /* Darker blue */
+}
+.list-item {
+    margin: 10px; /* Space between items */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 4px;
+  }
+.list-item a {
+    color: #1a9252;
+    text-decoration: none;
+}
+
+/* This will target the container of each article */
+.article-info {
+    display: flex;
+    align-items: center;
+    justify-content: start; /* Aligns content to the left */
+    gap: 10px; /* Adjust the gap between elements as needed */
+}
+
+/* This will style the image within the article-info container */
+.article-info img {
+    width: 120px; /* Increase the width as needed */
+    height: 80px; /* Adjust height as needed */
+    object-fit: cover; /* Adjust if necessary to cover the area */
+    border-radius: 4px; /* Rounded corners for the image */
+    flex-shrink: 0; /* Prevents the image from shrinking */
+}
+
+/* This will target the text part of the article, which is the title and any additional information */
+.article-info .article-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centers the content vertically */
+    width: 100%; /* Takes the remaining space */
+}
+
+/* This will target the title in the article-text container */
+.article-info .article-text .article-title {
+    font-size: 1rem; /* Adjust font size as needed */
+    font-weight: bold; /* Makes it bold */
+    margin: 0; /* Removes margin */
+    color: #333; /* Dark text color for better readability */
+}
+
+/* This will target the button under the image and title */
+.article-info .comment-button {
+    align-self: center; /* Centers button in the container */
+    padding: 10px 20px; /* Adjust padding as needed */
+    margin-top: 10px; /* Space above the button */
+    background-color: #007bff; /* Button color */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold; /* Makes text bold */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.article-info .comment-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* This will target each list item, which is the container for the article */
+.list-item {
+    display: flex;
+    flex-direction: column; /* Stack image/title on top and button below */
+    padding: 15px;
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 8px;
+    margin-bottom: 10px; /* Space between articles */
+}
+
+/* Ensure that images do not exceed their container width */
+img {
+    max-width: 100%;
+    height: auto;
 }

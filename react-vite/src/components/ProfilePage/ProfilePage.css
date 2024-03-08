@@ -18,9 +18,11 @@
 }
 
 .profile-info {
+  display: flex;
   border-bottom: 2px solid #eee;
   padding-bottom: 20px;
   margin-bottom: 20px;
+  justify-content: center;
 }
 
 .profile-info p {

@@ -86,7 +86,7 @@ function HomePage() {
                     </div>
                     <ul className="list">
                         {stocks.map(stock => (
-                            <li key={stock.symbol} className="list-item">
+                            <li key={stock.symbol} className="home-list-item">
                                 <Link to={`/stock/${stock.symbol}`}>{stock.name}</Link> - ${stock.live_close}
                             </li>
                         ))}
@@ -97,7 +97,7 @@ function HomePage() {
         {/* Articles list */}
         <ul className="list">
             {articles.map(article => (
-                <li key={article.id} className="list-item">
+                <li key={article.id} className="home-list-item">
                     <div className="article-info">
                         {/* If articles include a photo */}
                         <img src={article.image_url} alt={article.title} />
@@ -105,7 +105,7 @@ function HomePage() {
                     </div>
                 </li>
             ))}
-        </ul>åç
+        </ul>
     </div>
     );
 }
