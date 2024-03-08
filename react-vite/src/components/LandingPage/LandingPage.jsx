@@ -1,13 +1,21 @@
-import { Link } from "react-router-dom";
 import './LandingPage.css';
+import  SignupFormModal  from '../SignupFormModal';// Import your SignupFormModal component
+import { useModal } from "../../context/Modal"; // Import the useModal hook
+import { useEffect } from "react";
 
 const LandingPage = () => {
+    const { setModalContent } = useModal();
+
+    const handleSignup = () => {
+        setModalContent(<SignupFormModal />);
+      };
+
     return (
         <div>
             <header className="about-section">
                 <h1>About Market-Monitor</h1>
                 <p>Market-Monitor provides you the ability to plan, track, and research stock movement in real time to develop intelligent and calculated trading strategies that you feel confident about.</p>
-                <Link to="/signup" className="signup-button">Signup</Link>
+                <button onClick={handleSignup} className="signup-button">Signup</button>
             </header>
             <section className="features-section">
                 <div className="feature">
