@@ -476,11 +476,11 @@ const StockDetailPage = () => {
       )}
       {/* Display other note properties as needed */}
       {editingNote.id === note.id ? (
-        <button onClick={() => saveNoteEdit(note.id)}>Save</button>
+        <button className='art-button' onClick={() => saveNoteEdit(note.id)}>Save</button>
       ) : (
         <>
-          <button onClick={() => startEdit(note)}>Edit</button>
-          <button onClick={() => deleteNote(note.id)}>Delete</button>
+          <button className='art-button' onClick={() => startEdit(note)}>Edit</button>
+          <button className='art-button' onClick={() => deleteNote(note.id)}>Delete</button>
         </>
       )}
     </div>
