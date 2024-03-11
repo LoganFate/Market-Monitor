@@ -241,46 +241,32 @@ const StockDetailPage = () => {
 
 
       // Function to add stock to watchlist
-      async function addToWatchlist(stockSymbol, category = 'default') {
+      const addToWatchlist = async (stockSymbol) => {
         try {
-            function getCSRFToken() {
-                const cookieString = document.cookie;
-                console.log('Cookie string:', cookieString);
-                if (cookieString) {
-                    const cookies = cookieString.split('; ');
-                    for (const cookie of cookies) {
-                        const [name, value] = cookie.split('=');
-                        if (name.trim() === 'csrf_token') {
-                            console.log('CSRF token:', value);
-                            return value;
-                        }
-                    }
-                }
-                return null;
-            }
-
-            const csrfToken = getCSRFToken();
-
-            if (!csrfToken) {
-                throw new Error('CSRF token not found');
-            }
-
-            await fetch("/api/watchlist", {
+            // Assuming fetchStockIdBySymbol is a function that fetches stock ID using the symbol
+            const stockId = await fetchStockIdBySymbol(stockSymbol); // Fetch stock ID by symbol
+            const response = await fetch('/api/watchlist', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
+                    'Accept': 'application/json'
                 },
+                credentials: 'include',
                 body: JSON.stringify({
-                    stock_id: stockSymbol,
-                    category: category
-                })
+                    stock_id: stockId, // Use the fetched stock ID
+                    category: 'default' // This can be dynamic based on your UI
+                }),
             });
 
+            if (!response.ok) throw new Error('Failed to add to watchlist');
+
+            // Handle success
+            console.log('Stock added to watchlist');
+            // Optionally update UI to reflect the addition
         } catch (error) {
-            console.error('Error adding to watchlist:', error);
+            console.error("Error adding to watchlist:", error);
         }
-    }
+    };
 
     const handleAddComment = async (e) => {
         e.preventDefault();
@@ -460,9 +446,10 @@ const StockDetailPage = () => {
     </div>
     <div className="chart-container">
         <div ref={chartContainerRef} className="chart" style={{ width: '400px', height: '250px' }}></div>
-        <button onClick={() => addToWatchlist(stockSymbol)}>Add to Watchlist</button>
+
     </div>
     </div>
+    <button onClick={() => addToWatchlist(stockSymbol)}>Add to Watchlist</button>
     <div className="notes-list">
   {notes.map((note) => (
     <div key={note.id} className="note">

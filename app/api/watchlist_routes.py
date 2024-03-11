@@ -7,7 +7,7 @@ watchlist_routes = Blueprint('watchlist', __name__)
 
 
 
-@watchlist_routes.route('/', methods=['POST'])
+@watchlist_routes.route('', methods=['POST'])
 @login_required
 def add_stock_to_watchlist():
     data = request.get_json()

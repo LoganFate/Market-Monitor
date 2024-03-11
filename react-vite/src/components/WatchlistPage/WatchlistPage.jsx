@@ -152,10 +152,7 @@ const WatchlistPage = () => {
             {watchlist.map((stock, index) => (
                 <div key={stock.symbol}>
                     <h3>{`Stock ${index + 1}: ${stock.symbol}`}</h3>
-                    <p>Symbol: {stock.symbol}</p>
-                    <p>Name: {stock.name}</p>
-                    <p>Price: {stock.price}</p>
-                    <div id={`chart-container-${stock.symbol}`} style={{ height: '300px' }}></div>
+                    <div id={`chart-container-${stock.symbol}`} style={{ width: '400px', height: '300px' }}></div>
                 </div>
             ))}
         </div>
