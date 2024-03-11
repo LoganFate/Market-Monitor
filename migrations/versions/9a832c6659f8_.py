@@ -1,11 +1,16 @@
-"""Adjusted migration script with schema logic for production environment and specified order."""
+"""empty message
 
+Revision ID: 9a832c6659f8
+Revises:
+Create Date: 2024-03-11 09:52:28.899817
+
+"""
 from alembic import op
 import sqlalchemy as sa
 import os
 
 # revision identifiers, used by Alembic.
-revision = '85bcb1c1c565'
+revision = '9a832c6659f8'
 down_revision = None
 branch_labels = None
 depends_on = None
