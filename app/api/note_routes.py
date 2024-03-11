@@ -69,7 +69,7 @@ def edit_note(note_id):
     note.text = note_text
     db.session.commit()
 
-    return jsonify({"message": "Note updated successfully"}), 200
+    return jsonify(note.to_dict()), 200
 
 @note_routes.route('/<int:note_id>', methods=['DELETE'])
 @login_required

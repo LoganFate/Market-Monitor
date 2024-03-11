@@ -102,6 +102,15 @@ body {
     margin-top: 10px;
 }
 
+.art-button {
+    gap: 15px;
+   margin-left: 10px;
+}
+.ed-buttons {
+    gap: 15px;
+    width: 100%;
+    justify-content: space-between;
+}
 .list-item {
     background-color: #f9f9f9; /* Light background */
     border: 1px solid #eaeaea; /* Light border */
@@ -226,4 +235,86 @@ button:hover {
 img {
     max-width: 100%;
     height: auto;
+}
+
+
+.add-note-container {
+    background-color: #f4f4f4;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for the textarea */
+.add-note-container textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    resize: vertical;
+}
+
+/* Style for buttons */
+.add-note-container button {
+    background-color: #199c4d; /* Blue */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    float: right;
+}
+
+.add-note-container button:hover {
+    background-color: #0e8e34;
+}
+
+/* Notes list styling */
+.notes-list {
+    margin-top: 20px;
+}
+
+.note {
+    background-color: #fff;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.note p {
+    margin: 0;
+    color: #333;
+}
+
+/* Edit and Delete button styles inside note */
+.note .ed-buttons {
+    margin-top: 10px;
+    text-align: right;
+}
+
+.note .ed-buttons .art-button {
+    background-color: #666;
+    color: white;
+    padding: 5px 10px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.note .ed-buttons .art-button:hover {
+    background-color: #555;
+}
+
+/* Style for editing note textarea */
+.note-editing textarea {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    resize: vertical;
 }

@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, current_app
 from app.models import db, Stock
 from .polygon_helper import fetch_multiple_stocks_data
 import os
@@ -44,3 +44,15 @@ def get_stocks():
             print(f"Error fetching live data for {response['symbol']}: {response['error']}")
 
     return jsonify(enriched_stocks), 200
+
+@stock_routes.route('/<symbol>', methods=['GET'])
+def get_stock_by_symbol(symbol):
+    try:
+        stock = Stock.query.filter_by(symbol=symbol.upper()).first()
+        if stock:
+            return jsonify(stock.to_dict()), 200
+        else:
+            return jsonify({"error": "Stock not found"}), 404
+    except Exception as e:
+        current_app.logger.error(f"Failed to fetch stock by symbol: {e}")
+        return jsonify({"error": "Internal server error"}), 500

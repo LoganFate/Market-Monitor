@@ -134,7 +134,8 @@ const ProfilePage = () => {
     setNewPlan({ planner_category: plan.category, plan_text: plan.text });
     setIsEditMode(true);
     setEditingPlanId(plan.id);
-    setShowAddPlanForm(true); // Assuming you are using this state to toggle the visibility of the form
+    setShowAddPlanForm(true);
+    toggleAddButtonVisibility();
   };
 
   const resetFormAndExitEditMode = () => {
@@ -143,6 +144,7 @@ const ProfilePage = () => {
     setEditingPlanId(null); // Clear editing ID
     setShowAddPlanForm(false); // Hide form
     setFormErrors({}); // Clear any form errors
+    toggleAddButtonVisibility();
   };
 
   function formatDate(dateString) {
@@ -153,6 +155,12 @@ const ProfilePage = () => {
     return `${month}-${day}-${year}`;
   }
 
+  const toggleAddButtonVisibility = () => {
+    const addButton = document.querySelector('.add-plan-button');
+    if (addButton) {
+      addButton.classList.toggle('hidden');
+    }
+  };
   return (
     <div className="profile-page">
     <header className="profile-header">
@@ -171,10 +179,10 @@ const ProfilePage = () => {
         {plannerEntries.length > 0 ? (
             plannerEntries.map(entry => (
                 <div key={entry.id} className="planner-entry">
-                    <h3>{entry.category}</h3>
+                    <h3 className='category'>{entry.category}</h3>
                     <p>{entry.text}</p>
-                    <button onClick={() => requestDeleteConfirmation(entry.id)}>Delete</button>
-                    <button onClick={() => handleEditPlan(entry)}>Edit</button>
+                    <button className="button" onClick={() => requestDeleteConfirmation(entry.id)}>Delete</button>
+                    <button className="button" onClick={() => handleEditPlan(entry)}>Edit</button>
                     <p>{formatDate(entry.created_at)}</p>
                 </div>
             ))
@@ -182,28 +190,39 @@ const ProfilePage = () => {
             <p>No planner entries found.</p>
         )}
     </section>
-    {showAddPlanForm && (
+  <div className="form-container">
+    { showAddPlanForm && (
   <form onSubmit={handleFormSubmit}>
-    <input
-      type="text"
-      placeholder="Category"
-      value={newPlan.planner_category}
-      onChange={(e) => setNewPlan({ ...newPlan, planner_category: e.target.value })}
-    />
-    {formErrors.planner_category && <p className="form-error">{formErrors.planner_category}</p>}
+    <div className="input-group">
+      <input
+        type="text"
+        placeholder="Category"
+        className="input-field"
+        value={newPlan.planner_category}
+        onChange={(e) => setNewPlan({ ...newPlan, planner_category: e.target.value })}
+      />
+      {formErrors.planner_category && <p className="form-error">{formErrors.planner_category}</p>}
+    </div>
 
-    <textarea
-      placeholder="Plan Text"
-      value={newPlan.plan_text}
-      onChange={(e) => setNewPlan({ ...newPlan, plan_text: e.target.value })}
-    />
-     {formErrors.plan_text && <p className="form-error">{formErrors.plan_text}</p>}
+    <div className="input-group">
+      <textarea
+        placeholder="Plan Text"
+        className="textarea-field"
+        value={newPlan.plan_text}
+        onChange={(e) => setNewPlan({ ...newPlan, plan_text: e.target.value })}
+      />
+      {formErrors.plan_text && <p className="form-error">{formErrors.plan_text}</p>}
+    </div>
 
-     <button type="submit">{isEditMode ? 'Update Plan' : 'Add Plan'}</button>
-     <button onClick={resetFormAndExitEditMode}>Cancel</button>
+    <div className="button-group">
+      <button className="button submit-button" type="submit">{isEditMode ? 'Update Plan' : 'Add Plan'}</button>
+      <button className="button cancel-button" onClick={resetFormAndExitEditMode}>Cancel</button>
+    </div>
   </form>
-)}
-<button onClick={() => setShowAddPlanForm(true)}>Add New Plan</button>
+    )}
+  <button className="button add-plan-button" onClick={() => { setShowAddPlanForm(true); toggleAddButtonVisibility(); }}>Add New Plan</button>
+</div>
+
 </div>
   );
 };

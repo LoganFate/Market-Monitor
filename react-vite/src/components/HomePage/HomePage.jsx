@@ -7,11 +7,12 @@ import './HomePage.css'
 function HomePage() {
     const tickers = ['AAPL', 'TSLA', 'GOOGL', 'MSFT']; // Add your tickers here
     const [stocks, setStocks] = useState([]);
-    const [articles, setArticles] = useState([]);
+    const [articles, setArticles] = useState([12]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [chartData, setChartData] = useState({});
     const apiKey = 'unLg31iXhM99E5yWodIRsOe3pugcBLnl'; // This should be securely handled
+    const [articleLimit, setArticleLimit] = useState(12);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -69,7 +70,7 @@ function HomePage() {
         };
 
         fetchData();
-        const interval = setInterval(fetchData, 60000); // Optional: Refetch data every minute
+        const interval = setInterval(fetchData, 600000); // Optional: Refetch data every minute
         return () => clearInterval(interval);
     }, []);
 
@@ -96,7 +97,7 @@ function HomePage() {
         <h2 className="heading">Latest Articles</h2>
         {/* Articles list */}
         <ul className="list">
-            {articles.map(article => (
+            {articles.slice(0, articleLimit).map(article => (
                 <li key={article.id} className="home-list-item">
                     <div className="article-info">
                         {/* If articles include a photo */}

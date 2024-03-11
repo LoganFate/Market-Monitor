@@ -19,7 +19,9 @@ const StockDetailPage = () => {
     const [editingComment, setEditingComment] = useState({ id: null, text: "" });
     const currentUser = useSelector((state) => state.session.user);
     const [historicalData, setHistoricalData] = useState({ prices: [], dates: [] });
-
+    const [noteText, setNoteText] = useState('');
+    const [notes, setNotes] = useState([]);
+    const [editingNote, setEditingNote] = useState({ id: null, text: "" });
 
 
     useEffect(() => {
@@ -49,6 +51,18 @@ const StockDetailPage = () => {
             console.error('Failed to fetch historical data:', error);
           }
         };
+        const fetchNotes = async () => {
+            try {
+                const response = await fetch(`/api/notes/${stock_id}`);
+                if (!response.ok) throw new Error('Failed to fetch notes');
+                const data = await response.json();
+                setNotes(data); // Assuming the backend returns an array of notes
+            } catch (error) {
+                console.error("Error fetching notes:", error);
+            }
+        };
+
+        fetchNotes();
 
         fetchHistoricalData();
       }, [stockSymbol]); // Re-fetch when stockSymbol changes
@@ -64,6 +78,7 @@ const StockDetailPage = () => {
             tension: 0.1
           }
         ]
+
       };
 
 
@@ -343,6 +358,91 @@ const StockDetailPage = () => {
         setCommentText('');
         setArticleIdForComment(null); // Optional
     };
+    async function fetchStockIdBySymbol(stockSymbol) {
+        const response = await fetch(`/api/stocks/${stockSymbol}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch stock ID');
+        }
+        const data = await response.json();
+        return data.id; // Assuming your API returns an object with a stock_id property
+    }
+
+    const handleAddNote = async (e) => {
+        e.preventDefault();
+
+        try {
+            const stockId = await fetchStockIdBySymbol(stockSymbol); // Fetch stock ID by symbol
+            console.log("Stock ID fetched:", stockId);
+            const response = await fetch('/api/notes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    stock_id: stockId, // Use the fetched stock ID here
+                    note_text: noteText,
+                }),
+            });
+
+            if (!response.ok) throw new Error('Failed to add note');
+
+            const newNote = await response.json();
+            setNotes((prevNotes) => [...prevNotes, newNote]);
+            setNoteText(''); // Reset input field
+        } catch (error) {
+            console.error("Error adding note:", error);
+        }
+    };
+
+    const startEdit = (note) => {
+        setEditingNote({ id: note.id, text: note.text });
+      };
+
+      const saveNoteEdit = async (noteId) => {
+        try {
+          const response = await fetch(`/api/notes/${noteId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ note_text: editingNote.text }),
+          });
+
+          if (!response.ok) throw new Error('Failed to save note edit.');
+
+
+          const updatedNote = await response.json(); // Make sure your backend returns the updated note
+
+          // Update the notes array with the updated note
+          setNotes((prevNotes) =>
+            prevNotes.map((note) => (note.id === updatedNote.id ? updatedNote : note))
+          );
+
+          // Reset editingNote to exit editing mode
+          setEditingNote({ id: null, text: "" });
+        } catch (error) {
+          console.error("Error saving note edit:", error);
+        }
+      };
+
+      const deleteNote = async (noteId) => {
+        // Call API to delete the note
+        try {
+          const response = await fetch(`/api/notes/${noteId}`, {
+            method: 'DELETE',
+          });
+
+          if (!response.ok) throw new Error('Failed to delete note.');
+
+          // Remove note from state
+          setNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
+        } catch (error) {
+          console.error("Error deleting note:", error);
+        }
+      };
+
 
     return (
         <div className="container">
@@ -363,6 +463,41 @@ const StockDetailPage = () => {
         <button onClick={() => addToWatchlist(stockSymbol)}>Add to Watchlist</button>
     </div>
     </div>
+    <div className="notes-list">
+  {notes.map((note) => (
+    <div key={note.id} className="note">
+      {editingNote.id === note.id ? (
+        <textarea
+          value={editingNote.text}
+          onChange={(e) => setEditingNote({ ...editingNote, text: e.target.value })}
+        />
+      ) : (
+        <p>{note.text}</p>
+      )}
+      {/* Display other note properties as needed */}
+      {editingNote.id === note.id ? (
+        <button onClick={() => saveNoteEdit(note.id)}>Save</button>
+      ) : (
+        <>
+          <button onClick={() => startEdit(note)}>Edit</button>
+          <button onClick={() => deleteNote(note.id)}>Delete</button>
+        </>
+      )}
+    </div>
+  ))}
+</div>
+
+    <div className="add-note-container">
+    <form onSubmit={handleAddNote}>
+        <textarea
+            value={noteText}
+            onChange={(e) => setNoteText(e.target.value)}
+            placeholder="Add a note..."
+            required
+        />
+        <button type="submit">Add Note</button>
+    </form>
+</div>
     <div className="articles-container">
         <h2 className="heading">Latest Articles for {stockSymbol}</h2>
         <ul className="list">
@@ -390,10 +525,10 @@ const StockDetailPage = () => {
    <div key={`${comment.id}_${index}`}>
    <p>{comment.text}</p>
    {currentUser && currentUser.id === comment.user_id && (
-    <>
-        <button onClick={() => startEditComment(article.id, comment)}>Edit</button>
-        <button onClick={() => handleDeleteComment(article.id, comment.id)}>Delete</button>
-    </>
+    <div className='ed-buttons'>
+        <button className="art-button" onClick={() => startEditComment(article.id, comment)}>Edit</button>
+        <button className="art-button" onClick={() => handleDeleteComment(article.id, comment.id)}>Delete</button>
+    </div>
 )}
 </div>
 ))}
