@@ -10,28 +10,28 @@ pinned_routes = Blueprint('pinned', __name__)
 @login_required
 def pin_article():
     data = request.get_json()
-    article_title = data.get('title')  # Assuming you're sending the title
+    title = data.get('title')  # Assuming you're sending the title
     article_id = data.get('article_id')
     category = data.get('category', 'default')
 
     # Attempt to fetch the article by title
-    article = Article.query.filter_by(title=article_title).first()
+    article = Article.query.filter_by(id=article_id).first() if article_id else Article.query.filter_by(title=title).first()
 
     # If the article does not exist, create a new article object with the given details
     if not article and article_id:
-        new_article = Article(
+        article = Article(
             id=article_id,
-            title=article_title,
+            title=title,
             content=data.get('content', ''),  # Default to empty string if content is not provided
             author=data.get('author', ''),  # Default to empty string if author is not provided
             article_url=data.get('article_url', ''),  # Default to empty string if article_url is not provided
             image_url=data.get('image_url', ''),  # Default to empty string if image_url is not provided
             published_utc=datetime.strptime(data.get('published_utc'), '%Y-%m-%dT%H:%M:%SZ') if data.get('published_utc') else None,  # Handle date conversion
-            publisher=data.get('publisher', '')  # Default to empty string if publisher is not provided
+            publisher=data.get('publisher', '{}')  # Default to empty string if publisher is not provided
         )
-        db.session.add(new_article)
+        db.session.add(article)
         db.session.commit()
-        article = new_article  # Assign the newly created article for pinning
+        article = article  # Assign the newly created article for pinning
 
     # If article_id is not provided in the request, it's an error
     if not article_id:

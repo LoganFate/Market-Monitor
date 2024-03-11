@@ -77,23 +77,23 @@ function HomePage() {
     if (isLoading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
 
-    const fetchArticleIdByTitle = async (title) => {
-        try {
-            const response = await fetch(`/api/articles/title/${encodeURIComponent(title)}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch article ID');
-            }
-            const article = await response.json();
-            return article.id;  // Assuming the backend returns the article's ID in its response
-        } catch (error) {
-            console.error("Error fetching article ID by title:", error);
-            return null;  // Handle the error appropriately
-        }
-    };
+    // const fetchArticleIdByTitle = async (title) => {
+    //     try {
+    //         const response = await fetch(`/api/articles/title/${encodeURIComponent(title)}`);
+    //         if (!response.ok) {
+    //             throw new Error('Failed to fetch article ID');
+    //         }
+    //         const article = await response.json();
+    //         return article.id;  // Assuming the backend returns the article's ID in its response
+    //     } catch (error) {
+    //         console.error("Error fetching article ID by title:", error);
+    //         return null;  // Handle the error appropriately
+    //     }
+    // };
 
     const pinArticle = async (articleId, category = 'default') => {
         try {
-            const response = await fetch('/api/pinned/', {
+            const response = await fetch('/api/pinned', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -112,17 +112,20 @@ function HomePage() {
         }
     };
 
-    const handlePinArticleByTitle = async (articleTitle) => {
-        const articleId = await fetchArticleIdByTitle(articleTitle);
-        if (articleId) {
-            // Now you have the article ID, and you can proceed to pin the article.
-            await pinArticle(articleId);
-        } else {
-            console.error("Could not find article to pin.");
-            // Handle the situation where the article ID couldn't be fetched
-        }
-    };
-
+    // const handlePinArticleByTitle = async (articleTitle) => {
+    //     try {
+    //         const articleId = await fetchArticleIdByTitle(articleTitle);
+    //         if (articleId) {
+    //             await pinArticle(articleId);
+    //             console.log('Article pinned successfully');
+    //             // Update UI/state as needed
+    //         } else {
+    //             console.error("Could not find article to pin.");
+    //         }
+    //     } catch (error) {
+    //         console.error("Error during pinning process:", error);
+    //     }
+    // };
 
     return (
         <div className="container">
@@ -149,7 +152,7 @@ function HomePage() {
             <div className="article-info">
                 <img src={article.image_url} alt={article.title} />
                 <a href={article.article_url} target="_blank" rel="noopener noreferrer">{article.title}</a>
-                <button onClick={() => handlePinArticleByTitle(article.title)}>Pin</button>
+                {/* <button onClick={() => pinArticle(article.id)}>Pin</button> */}
             </div>
         </li>
     ))}

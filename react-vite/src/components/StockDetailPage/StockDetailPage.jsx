@@ -22,6 +22,7 @@ const StockDetailPage = () => {
     const [noteText, setNoteText] = useState('');
     const [notes, setNotes] = useState([]);
     const [editingNote, setEditingNote] = useState({ id: null, text: "" });
+    const [isInWatchlist, setIsInWatchlist] = useState(false);
 
 
     useEffect(() => {
@@ -65,6 +66,7 @@ const StockDetailPage = () => {
         fetchNotes();
 
         fetchHistoricalData();
+        checkWatchlistStatus();
       }, [stockSymbol]); // Re-fetch when stockSymbol changes
 
       // Data for the line chart
@@ -268,6 +270,30 @@ const StockDetailPage = () => {
         }
     };
 
+    const checkWatchlistStatus = async () => {
+        try {
+            // Fetch the user's entire watchlist
+            const response = await fetch(`/api/watchlist/`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', // Include cookies
+            });
+            if (!response.ok) {
+                throw new Error('Failed to fetch watchlist');
+            }
+            const watchlistItems = await response.json(); // Assuming this returns an array of watchlist items
+
+            // Assuming you have a way to fetch the current stock ID based on the symbol
+            const stockId = await fetchStockIdBySymbol(stockSymbol); // You need to implement this function
+
+            // Check if the current stock is in the watchlist
+            const isInWatchlist = watchlistItems.some(item => item.stock_id === stockId);
+            setIsInWatchlist(isInWatchlist);
+        } catch (error) {
+            console.error("Error checking watchlist status:", error);
+        }
+    };
     const handleAddComment = async (e) => {
         e.preventDefault();
 
@@ -449,7 +475,9 @@ const StockDetailPage = () => {
 
     </div>
     </div>
-    <button onClick={() => addToWatchlist(stockSymbol)}>Add to Watchlist</button>
+    {!isInWatchlist && (
+                <button onClick={() => addToWatchlist(stockSymbol)}>Add to Watchlist</button>
+            )}
     <div className="notes-list">
   {notes.map((note) => (
     <div key={note.id} className="note">
@@ -509,7 +537,7 @@ const StockDetailPage = () => {
                                 )}
                                  <div className="comments">
                                  {commentsByArticleId[article.id] && commentsByArticleId[article.id].map((comment, index) => (
-   <div key={`${comment.id}_${index}`}>
+   <div className='comment' key={`${comment.id}_${index}`}>
    <p>{comment.text}</p>
    {currentUser && currentUser.id === comment.user_id && (
     <div className='ed-buttons'>
