@@ -107,14 +107,17 @@ const ProfilePage = () => {
 
   const requestDeleteConfirmation = (planId) => {
     setModalContent(
-      <div>
-        <p>Are you sure you want to delete this plan?</p>
-        <button onClick={() => handleDeletePlan(planId)}>Confirm</button>
-        <button onClick={closeModal}>Cancel</button>
+      <div className="delete-confirmation-modal">
+        <div className="modal-content">
+          <p>Are you sure you want to delete this plan?</p>
+          <div className="modal-actions">
+            <button className="modal-button confirm" onClick={() => handleDeletePlan(planId)}>Confirm</button>
+            <button className="modal-button cancel" onClick={closeModal}>Cancel</button>
+          </div>
+        </div>
       </div>
     );
   };
-
   const handleDeletePlan = async (planId) => {
     closeModal();
     try {

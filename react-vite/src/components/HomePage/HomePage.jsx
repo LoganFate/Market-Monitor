@@ -12,7 +12,7 @@ function HomePage() {
     const [error, setError] = useState(null);
     const [chartData, setChartData] = useState({});
     const apiKey = 'unLg31iXhM99E5yWodIRsOe3pugcBLnl'; // This should be securely handled
-    const [articleLimit, setArticleLimit] = useState(12);
+    const [articleLimit, setArticleLimit] = useState(15);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -74,7 +74,11 @@ function HomePage() {
         return () => clearInterval(interval);
     }, []);
 
-    if (isLoading) return <div>Loading...</div>;
+    if (isLoading) return (
+        <div className="loading-container">
+          <div className="spinner"></div>
+        </div>
+      );
     if (error) return <div>Error: {error}</div>;
 
     // const fetchArticleIdByTitle = async (title) => {
@@ -91,26 +95,26 @@ function HomePage() {
     //     }
     // };
 
-    const pinArticle = async (articleId, category = 'default') => {
-        try {
-            const response = await fetch('/api/pinned', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify({ article_id: articleId, category }),
-            });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to pin article');
-            }
-            console.log('Article pinned successfully');
-            // Optionally, update your state/UI to reflect the pinning
-        } catch (error) {
-            console.error("Error pinning article:", error.message);
-        }
-    };
+    // const pinArticle = async (articleId, category = 'default') => {
+    //     try {
+    //         const response = await fetch('/api/pinned', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             credentials: 'include',
+    //             body: JSON.stringify({ article_id: articleId, category }),
+    //         });
+    //         if (!response.ok) {
+    //             const errorData = await response.json();
+    //             throw new Error(errorData.error || 'Failed to pin article');
+    //         }
+    //         console.log('Article pinned successfully');
+    //         // Optionally, update your state/UI to reflect the pinning
+    //     } catch (error) {
+    //         console.error("Error pinning article:", error.message);
+    //     }
+    // };
 
     // const handlePinArticleByTitle = async (articleTitle) => {
     //     try {
@@ -133,7 +137,11 @@ function HomePage() {
         {stocks.length > 0 && (
                 <div>
                     <div className="chart-container">
-                        <Line data={chartData} />
+                        <Line data={chartData} options={{
+        responsive: true,
+        maintainAspectRatio: false,
+        // Any additional options...
+    }}  />
                     </div>
                     <ul className="list">
                         {stocks.map(stock => (

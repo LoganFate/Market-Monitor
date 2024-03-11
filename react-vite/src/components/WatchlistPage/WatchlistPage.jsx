@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { createChart, CrosshairMode } from 'lightweight-charts';
+import './Watchlist.css'
 
 const WatchlistPage = () => {
 
@@ -188,35 +189,34 @@ const WatchlistPage = () => {
 
 
     return (
-        <div>
-        <h2>My Watchlist</h2>
-        {watchlist.map((stock, index) => (
-            <div key={stock.symbol}>
-                <h3>{`Stock ${index + 1}: ${stock.symbol}`}</h3>
-                <p><strong>Category:</strong> {stock.category}</p>
-                <div id={`chart-container-${stock.symbol}`} style={{ width: '400px', height: '300px' }}></div>
-                {
-    editMode.active && editMode.stockId === stock.id ? (
-        <>
-            <input
-                type="text"
-                value={editMode.category}
-                onChange={(e) => setEditMode({ ...editMode, category: e.target.value })}
-            />
-            <button onClick={() => editWatchlistItem(stock.id, editMode.category)}>Save</button>
-        </>
-    ) : (
-        <>
-
-            <button onClick={() => setEditMode({ active: true, stockId: stock.id, category: stock.category })}>Edit Category</button>
-            <button onClick={() => deleteWatchlistItem(stock.id)}>Delete</button>
-        </>
-    )
-}
-            </div>
-        ))}
-    </div>
-);
-};
-
+        <div className="watchlist-container">
+            <h2>My Watchlist</h2>
+            {watchlist.map((stock, index) => (
+                <div key={stock.symbol} className="stock-container">
+                    <h3>{`Stock ${index + 1}: ${stock.symbol}`}</h3>
+                    <p><strong>Category:</strong> {stock.category}</p>
+                    <div id={`chart-container-${stock.symbol}`} className="chart-container"></div>
+                    {
+                        editMode.active && editMode.stockId === stock.id ? (
+                            <>
+                                <input
+                                    type="text"
+                                    value={editMode.category}
+                                    onChange={(e) => setEditMode({ ...editMode, category: e.target.value })}
+                                    className="input"
+                                />
+                                <button onClick={() => editWatchlistItem(stock.id, editMode.category)} className="button">Save</button>
+                            </>
+                        ) : (
+                            <>
+                                <button onClick={() => setEditMode({ active: true, stockId: stock.id, category: stock.category })} className="button">Edit Category</button>
+                                <button onClick={() => deleteWatchlistItem(stock.id)} className="button">Delete</button>
+                            </>
+                        )
+                    }
+                </div>
+            ))}
+        </div>
+    );
+                };
 export default WatchlistPage;

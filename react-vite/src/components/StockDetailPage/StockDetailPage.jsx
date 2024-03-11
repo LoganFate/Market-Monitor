@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
 import { createChart, CrosshairMode } from 'lightweight-charts';
 import { useSelector } from 'react-redux';
+import { useModal } from '../../context/Modal';
 import 'chart.js/auto';
 import './StockDetail.css'
 
@@ -23,6 +24,7 @@ const StockDetailPage = () => {
     const [notes, setNotes] = useState([]);
     const [editingNote, setEditingNote] = useState({ id: null, text: "" });
     const [isInWatchlist, setIsInWatchlist] = useState(false);
+    const { setModalContent, closeModal } = useModal();
 
 
     useEffect(() => {
@@ -346,7 +348,19 @@ const StockDetailPage = () => {
         setEditingComment({ id: comment.id, text: comment.text });
         setCommentText(comment.text);
     };
-    const handleDeleteComment = async (articleId, commentId) => {
+
+    const requestDeleteCommentConfirmation = (articleId, commentId) => {
+        setModalContent(
+            <div>
+                <p>Are you sure you want to delete this comment?</p>
+                <button onClick={() => handleDeleteCommentConfirmed(articleId, commentId)}>Confirm</button>
+                <button onClick={closeModal}>Cancel</button>
+            </div>
+        );
+    };
+
+    const handleDeleteCommentConfirmed = async (articleId, commentId) => {
+        closeModal();
         try {
             const response = await fetch(`/api/comments/${commentId}`, {
                 method: 'DELETE',
@@ -378,6 +392,20 @@ const StockDetailPage = () => {
         const data = await response.json();
         return data.id; // Assuming your API returns an object with a stock_id property
     }
+    useEffect(() => {
+        const fetchNotes = async () => {
+          try {
+            const response = await fetch(`/api/notes/${stockSymbol}`);
+            if (!response.ok) throw new Error('Failed to fetch notes');
+            const data = await response.json();
+            setNotes(data.notes); // Assuming your API returns an object with a notes array
+          } catch (error) {
+            console.error("Error fetching notes:", error);
+          }
+        };
+
+        fetchNotes();
+      }, [stockSymbol]); // Dependency array, fetch notes again if stock_id changes
 
     const handleAddNote = async (e) => {
         e.preventDefault();
@@ -439,7 +467,19 @@ const StockDetailPage = () => {
         }
       };
 
-      const deleteNote = async (noteId) => {
+
+      const requestDeleteNoteConfirmation = (noteId) => {
+        setModalContent(
+            <div>
+                <p>Are you sure you want to delete this note?</p>
+                <button onClick={() => handleDeleteNoteConfirmed(noteId)}>Confirm</button>
+                <button onClick={closeModal}>Cancel</button>
+            </div>
+        );
+    };
+
+      const handleDeleteNoteConfirmed = async (noteId) => {
+        closeModal();
         // Call API to delete the note
         try {
           const response = await fetch(`/api/notes/${noteId}`, {
@@ -495,7 +535,7 @@ const StockDetailPage = () => {
       ) : (
         <>
           <button className='art-button' onClick={() => startEdit(note)}>Edit</button>
-          <button className='art-button' onClick={() => deleteNote(note.id)}>Delete</button>
+          <button className='art-button' onClick={() => requestDeleteNoteConfirmation(note.id)}>Delete</button>
         </>
       )}
     </div>
@@ -542,7 +582,7 @@ const StockDetailPage = () => {
    {currentUser && currentUser.id === comment.user_id && (
     <div className='ed-buttons'>
         <button className="art-button" onClick={() => startEditComment(article.id, comment)}>Edit</button>
-        <button className="art-button" onClick={() => handleDeleteComment(article.id, comment.id)}>Delete</button>
+        <button className="art-button" onClick={() => requestDeleteCommentConfirmation(article.id, comment.id)}>Delete</button>
     </div>
 )}
 </div>

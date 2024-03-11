@@ -1,0 +1,50 @@
+/* Watchlist container */
+.watchlist-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Creates two columns */
+    gap: 20px; /* Spacing between grid items */
+    padding: 20px; /* Optional: Adds some padding around the grid */
+}
+
+/* Individual stock container */
+.stock-container {
+    background-color: #f4f4f4; /* Light background for each stock */
+    padding: 15px; /* Padding inside each stock container */
+    border-radius: 10px; /* Rounded corners for aesthetics */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Soft shadow for depth */
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center items horizontally */
+}
+
+.stock-container:nth-child(1) { grid-column-start: 2; }
+.stock-container:nth-child(2) { grid-column-start: 1; }
+.stock-container:nth-child(3) { grid-column-start: 2; }
+.stock-container:nth-child(4) { grid-column-start: 1; }
+/* Chart container */
+.chart-container {
+    width: 100%; /* Use full width of the parent container */
+    height: 300px; /* Fixed height for charts */
+    margin-top: 15px; /* Space between the text and the chart */
+}
+
+/* Buttons and inputs styling */
+.button, .input {
+    margin-top: 10px; /* Space between each button/input */
+    padding: 8px 12px; /* Padding inside buttons/inputs */
+    border: none; /* Removes default border */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.button {
+    background-color: #007bff; /* Example button color */
+    color: white; /* Text color */
+    cursor: pointer; /* Cursor indicates clickable */
+}
+
+.input {
+    border: 1px solid #ddd; /* Light border for inputs */
+}
+h2 {
+    height: fit-content
+}
