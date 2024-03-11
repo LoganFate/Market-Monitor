@@ -2,16 +2,38 @@ from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
 from app.models import  db, Article, Pinned
 from sqlalchemy.sql import text
+from datetime import datetime
 
 pinned_routes = Blueprint('pinned', __name__)
 
-@pinned_routes.route('/', methods=['POST'])
+@pinned_routes.route('', methods=['POST'])
 @login_required
 def pin_article():
     data = request.get_json()
+    article_title = data.get('title')  # Assuming you're sending the title
     article_id = data.get('article_id')
     category = data.get('category', 'default')
 
+    # Attempt to fetch the article by title
+    article = Article.query.filter_by(title=article_title).first()
+
+    # If the article does not exist, create a new article object with the given details
+    if not article and article_id:
+        new_article = Article(
+            id=article_id,
+            title=article_title,
+            content=data.get('content', ''),  # Default to empty string if content is not provided
+            author=data.get('author', ''),  # Default to empty string if author is not provided
+            article_url=data.get('article_url', ''),  # Default to empty string if article_url is not provided
+            image_url=data.get('image_url', ''),  # Default to empty string if image_url is not provided
+            published_utc=datetime.strptime(data.get('published_utc'), '%Y-%m-%dT%H:%M:%SZ') if data.get('published_utc') else None,  # Handle date conversion
+            publisher=data.get('publisher', '')  # Default to empty string if publisher is not provided
+        )
+        db.session.add(new_article)
+        db.session.commit()
+        article = new_article  # Assign the newly created article for pinning
+
+    # If article_id is not provided in the request, it's an error
     if not article_id:
         return jsonify({"error": "Article ID is required."}), 400
 
@@ -39,7 +61,7 @@ def pin_article():
     return jsonify({"message": "Article pinned successfully with category."}), 201
 
 
-@pinned_routes.route('/', methods=['GET'])
+@pinned_routes.route('', methods=['GET'])
 @login_required
 def view_pinned_articles():
  articles_data = []
@@ -59,7 +81,7 @@ def view_pinned_articles():
 
  return jsonify(articles_data), 200
 
-@pinned_routes.route('/', methods=['DELETE'])
+@pinned_routes.route('', methods=['DELETE'])
 @login_required
 def unpin_article():
    data = request.get_json()
@@ -80,7 +102,7 @@ def unpin_article():
 
    return jsonify({"message": "Article unpinned successfully."}), 204
 
-@pinned_routes.route('/', methods=['PUT'])
+@pinned_routes.route('', methods=['PUT'])
 @login_required
 def update_pinned_article_category():
     data = request.get_json()

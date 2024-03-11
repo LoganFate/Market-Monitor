@@ -4,7 +4,7 @@ import { createChart, CrosshairMode } from 'lightweight-charts';
 const WatchlistPage = () => {
 
     const [watchlist, setWatchlist] = useState([]);
-
+    const [editMode, setEditMode] = useState({ active: false, stockId: null, category: '' });
     const webSocketRefs = useRef({});
     const chartRefs = useRef({});
 
@@ -134,29 +134,89 @@ const WatchlistPage = () => {
     };
 
 
-    // useEffect(() => {
-    //     watchlist.forEach(stock => {
-    //         if (stock.symbol && !chartContainersRefs.current[stock.symbol]) {
-    //             // Initialize chart for each stock
-    //             initChart(stock.symbol);
-    //         }
-    //     });
-    // }, [watchlist, initChart]);
+    const deleteWatchlistItem = async (watchlistId) => {
+        try {
+            const response = await fetch(`/api/watchlist/${watchlistId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include', // Make sure cookies are sent with the request if needed for authentication
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete watchlist item.');
+            }
+
+            // Update the UI accordingly
+            // For example, filter out the deleted item from the watchlist state
+            setWatchlist(currentWatchlist => currentWatchlist.filter(item => item.id !== watchlistId));
+
+            console.log('Watchlist item deleted successfully');
+        } catch (error) {
+            console.error("Error deleting watchlist item:", error.message);
+        }
+    };
+
+    const editWatchlistItem = async (watchlistId, newCategory) => {
+        try {
+            const response = await fetch(`/api/watchlist/${watchlistId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ category: newCategory })
+            });
+            if (!response.ok) throw new Error('Failed to edit watchlist item.');
+            await response.json(); // Assuming backend responds with the updated watchlist entry
+            setWatchlist(currentWatchlist =>
+                currentWatchlist.map(item =>
+                    item.id === watchlistId ? { ...item, category: newCategory } : item
+                )
+            );
+            // Exit edit mode
+            setEditMode({ active: false, stockId: null, category: '' });
+        } catch (error) {
+            console.error("Error editing watchlist item:", error);
+        }
+    };
+
 
 
 
 
     return (
         <div>
-            <h2>My Watchlist</h2>
-            {watchlist.map((stock, index) => (
-                <div key={stock.symbol}>
-                    <h3>{`Stock ${index + 1}: ${stock.symbol}`}</h3>
-                    <div id={`chart-container-${stock.symbol}`} style={{ width: '400px', height: '300px' }}></div>
-                </div>
-            ))}
-        </div>
-    );
+        <h2>My Watchlist</h2>
+        {watchlist.map((stock, index) => (
+            <div key={stock.symbol}>
+                <h3>{`Stock ${index + 1}: ${stock.symbol}`}</h3>
+                <p><strong>Category:</strong> {stock.category}</p>
+                <div id={`chart-container-${stock.symbol}`} style={{ width: '400px', height: '300px' }}></div>
+                {
+    editMode.active && editMode.stockId === stock.id ? (
+        <>
+            <input
+                type="text"
+                value={editMode.category}
+                onChange={(e) => setEditMode({ ...editMode, category: e.target.value })}
+            />
+            <button onClick={() => editWatchlistItem(stock.id, editMode.category)}>Save</button>
+        </>
+    ) : (
+        <>
+
+            <button onClick={() => setEditMode({ active: true, stockId: stock.id, category: stock.category })}>Edit Category</button>
+            <button onClick={() => deleteWatchlistItem(stock.id)}>Delete</button>
+        </>
+    )
+}
+            </div>
+        ))}
+    </div>
+);
 };
 
 export default WatchlistPage;

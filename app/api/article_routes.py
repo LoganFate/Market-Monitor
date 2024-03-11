@@ -1,7 +1,9 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from app.models import  db, Article
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError
+from urllib.parse import unquote
+
 
 
 article_routes = Blueprint('articles', __name__)
@@ -49,3 +51,17 @@ def add_articles():
         return jsonify(new_articles), 201
     else:
         return jsonify({"error": "No new articles were added. Articles may already exist."}), 200
+
+
+@article_routes.route('/title/<title>', methods=['GET'])
+def get_article_by_title(title):
+    current_app.logger.debug(f"Looking for article with title: {title}")
+    try:
+        decoded_title = unquote(title)
+        article = Article.query.filter_by(title=decoded_title).first()
+        if article:
+            return jsonify({"article_id": article.id}), 200
+        else:
+            return jsonify({"error": "Article not found"}), 404
+    except Exception as e:
+        return jsonify({"error": f"Internal server error: {e}"}), 500

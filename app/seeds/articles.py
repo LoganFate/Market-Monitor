@@ -14,7 +14,8 @@ def seed_articles():
             article_url='http://example.com/future-of-technology',
             image_url='http://example.com/images/future-of-technology.jpg',
             published_utc=datetime.utcnow(),
-            publisher=json.dumps({"name": "TechCrunch", "homepage_url": "https://techcrunch.com"})
+            publisher=json.dumps({"name": "TechCrunch", "homepage_url": "https://techcrunch.com"}),
+            category='Technology'
         ),
         Article(
             id="2",
@@ -24,7 +25,8 @@ def seed_articles():
             article_url='http://example.com/finance-trends-2024',
             image_url='http://example.com/images/finance-trends-2024.jpg',
             published_utc=datetime.utcnow(),
-            publisher=json.dumps({"name": "Bloomberg", "homepage_url": "https://www.bloomberg.com"})
+            publisher=json.dumps({"name": "Bloomberg", "homepage_url": "https://www.bloomberg.com"}),
+            category='Finance'
         ),
         Article(
             id="3",
@@ -44,7 +46,8 @@ def seed_articles():
             article_url='http://example.com/renewable-energy-sources',
             image_url='http://example.com/images/renewable-energy-sources.jpg',
             published_utc=datetime.utcnow(),
-            publisher=json.dumps({"name": "Energy Today", "homepage_url": "https://www.energytoday.com"})
+            publisher=json.dumps({"name": "Energy Today", "homepage_url": "https://www.energytoday.com"}),
+            category='Energy'
         ),
         Article(
             id="5",
@@ -54,7 +57,8 @@ def seed_articles():
             article_url='http://example.com/rise-of-consumer-goods',
             image_url='http://example.com/images/rise-of-consumer-goods.jpg',
             published_utc=datetime.utcnow(),
-            publisher=json.dumps({"name": "Consumer Reports", "homepage_url": "https://www.consumerreports.org"})
+            publisher=json.dumps({"name": "Consumer Reports", "homepage_url": "https://www.consumerreports.org"}),
+            category='Consumer Goods'
         ),
     ]
 

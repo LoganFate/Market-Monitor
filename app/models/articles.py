@@ -9,7 +9,7 @@ class Article(db.Model):
         __table_args__ = {'schema': SCHEMA}
 
 
-    id = db.Column(db.String, primary_key=True)  # Assuming id from API is unique
+    id = db.Column(db.Integer, primary_key=True)  # Assuming id from API is unique
     title = db.Column(db.String(255), nullable=False)
     content = db.Column(db.Text, nullable=False)  # You might want to map this to 'description' from the API data
     author = db.Column(db.String(100), nullable=True)
@@ -17,6 +17,8 @@ class Article(db.Model):
     image_url = db.Column(db.String(255), nullable=True)
     published_utc = db.Column(db.DateTime, nullable=True)
     publisher = db.Column(db.JSON, nullable=True)
+    category = db.Column(db.String(255), nullable=True)
+
 
     def to_dict(self):
         return {
@@ -27,5 +29,6 @@ class Article(db.Model):
             'article_url': self.article_url,
             'image_url': self.image_url,
             'published_utc': self.published_utc.isoformat() if self.published_utc else None,
-            'publisher': self.publisher  # This will return the JSON object/dict as is
+            'publisher': self.publisher,  # This will return the JSON object/dict as is
+            'category': self.category
         }

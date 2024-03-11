@@ -15,10 +15,10 @@ class Pinned(db.Model):
     article = db.relationship('Article', backref=db.backref('pinned_by_users', lazy=True))
 
 
-def to_dict(self):
+    def to_dict(self):
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'article_id': self.stock_id,
+            'article_id': self.article_id,
             'category': self.category
         }

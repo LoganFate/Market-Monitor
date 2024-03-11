@@ -4,6 +4,7 @@ import HomePage from '../components/HomePage'
 import StockDetailPage from '../components/StockDetailPage';
 import ProfilePage from '../components/ProfilePage'
 import WatchlistPage from '../components/WatchlistPage';
+import PinnedPage from '../components/PinnedPage'
 import Layout from './Layout';
 
 
@@ -30,6 +31,10 @@ export const router = createBrowserRouter([
       {
         path: "/watchlist",
         element: <WatchlistPage />
+      },
+      {
+        path: "/pinned",
+        element: <PinnedPage />
       }
     ],
   },

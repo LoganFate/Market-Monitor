@@ -5,7 +5,7 @@ import sqlalchemy as sa
 import os
 
 # revision identifiers, used by Alembic.
-revision = '9f4472cd6e41'
+revision = '85bcb1c1c565'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -40,6 +40,7 @@ def upgrade():
     sa.Column('image_url', sa.String(length=255), nullable=True),
     sa.Column('published_utc', sa.DateTime(), nullable=True),
     sa.Column('publisher', sa.JSON(), nullable=True),
+    sa.Column('category', sa.String(length=255), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     schema=SCHEMA if environment == 'production' else None
     )

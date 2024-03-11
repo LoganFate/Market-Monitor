@@ -77,6 +77,53 @@ function HomePage() {
     if (isLoading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
 
+    const fetchArticleIdByTitle = async (title) => {
+        try {
+            const response = await fetch(`/api/articles/title/${encodeURIComponent(title)}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch article ID');
+            }
+            const article = await response.json();
+            return article.id;  // Assuming the backend returns the article's ID in its response
+        } catch (error) {
+            console.error("Error fetching article ID by title:", error);
+            return null;  // Handle the error appropriately
+        }
+    };
+
+    const pinArticle = async (articleId, category = 'default') => {
+        try {
+            const response = await fetch('/api/pinned/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({ article_id: articleId, category }),
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to pin article');
+            }
+            console.log('Article pinned successfully');
+            // Optionally, update your state/UI to reflect the pinning
+        } catch (error) {
+            console.error("Error pinning article:", error.message);
+        }
+    };
+
+    const handlePinArticleByTitle = async (articleTitle) => {
+        const articleId = await fetchArticleIdByTitle(articleTitle);
+        if (articleId) {
+            // Now you have the article ID, and you can proceed to pin the article.
+            await pinArticle(articleId);
+        } else {
+            console.error("Could not find article to pin.");
+            // Handle the situation where the article ID couldn't be fetched
+        }
+    };
+
+
     return (
         <div className="container">
         <h2 className="heading">Featured Stocks</h2>
@@ -97,16 +144,16 @@ function HomePage() {
         <h2 className="heading">Latest Articles</h2>
         {/* Articles list */}
         <ul className="list">
-            {articles.slice(0, articleLimit).map(article => (
-                <li key={article.id} className="home-list-item">
-                    <div className="article-info">
-                        {/* If articles include a photo */}
-                        <img src={article.image_url} alt={article.title} />
-                        <a href={article.article_url} target="_blank" rel="noopener noreferrer">{article.title}</a>
-                    </div>
-                </li>
-            ))}
-        </ul>
+    {articles.slice(0, articleLimit).map(article => (
+        <li key={article.id} className="home-list-item">
+            <div className="article-info">
+                <img src={article.image_url} alt={article.title} />
+                <a href={article.article_url} target="_blank" rel="noopener noreferrer">{article.title}</a>
+                <button onClick={() => handlePinArticleByTitle(article.title)}>Pin</button>
+            </div>
+        </li>
+    ))}
+ </ul>
     </div>
     );
 }
