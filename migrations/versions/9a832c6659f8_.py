@@ -68,7 +68,7 @@ def upgrade():
     op.create_table('comments',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('article_id', sa.String(), nullable=False),
+    sa.Column('article_id', sa.Integer(), nullable=False),
     sa.Column('text', sa.Text(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['article_id'], [f'{SCHEMA}.articles.id'] if environment == 'production' else ['articles.id'], ondelete='CASCADE'),
