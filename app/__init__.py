@@ -1,4 +1,5 @@
 import os
+from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, session, redirect
 from flask_cors import CORS
@@ -54,7 +55,17 @@ app.register_blueprint(planner_routes, url_prefix='/api/planner')
 db.init_app(app)
 Migrate(app, db)
 
-# Application Secur
+# Schema creation logic
+if os.environ.get('FLASK_ENV') == 'production':
+    SCHEMA_NAME = 'market_monitor'  # Define your schema name here
+    with app.app_context():
+        # Assuming your SQLALCHEMY_DATABASE_URI is configured in app.config
+        engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+        with engine.connect() as conn:
+            conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA_NAME};"))
+            print(f"Schema {SCHEMA_NAME} checked/created.")
+
+Migrate(app, db)
 
 
 # Since we are deploying with Docker and Flask,
