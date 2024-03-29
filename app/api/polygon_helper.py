@@ -8,13 +8,13 @@ def fetch_multiple_stocks_data(symbols, api_key):
     stock_data = []
 
     for symbol in symbols:
-        # For example, fetching daily open/close data
+
         url = f"{base_url}/{symbol}/prev?adjusted=true&apiKey={api_key}"
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
             if 'results' in data and len(data['results']) > 0:
-                result = data['results'][0]  # Assuming we're interested in the most recent result
+                result = data['results'][0]
                 stock_info = {
                     'symbol': symbol,
                     'open': result.get('o'),
@@ -22,7 +22,7 @@ def fetch_multiple_stocks_data(symbols, api_key):
                     'high': result.get('h'),
                     'low': result.get('l'),
                     'volume': result.get('v'),
-                    # Add other fields as needed based on response structure
+
                 }
                 stock_data.append(stock_info)
             else:

@@ -351,10 +351,14 @@ const StockDetailPage = () => {
 
     const requestDeleteCommentConfirmation = (articleId, commentId) => {
         setModalContent(
-            <div>
-                <p>Are you sure you want to delete this comment?</p>
-                <button onClick={() => handleDeleteCommentConfirmed(articleId, commentId)}>Confirm</button>
-                <button onClick={closeModal}>Cancel</button>
+            <div className="modal-overlay">
+                <div className="modal-content">
+                    <p className="modal-text">Are you sure you want to delete this comment?</p>
+                    <div className="modal-buttons">
+                        <button className="modal-button confirm-button" onClick={() => handleDeleteCommentConfirmed(articleId, commentId)}>Confirm</button>
+                        <button className="modal-button cancel-button" onClick={closeModal}>Cancel</button>
+                    </div>
+                </div>
             </div>
         );
     };
@@ -395,51 +399,65 @@ const StockDetailPage = () => {
     useEffect(() => {
         const fetchNotes = async () => {
           try {
-            const response = await fetch(`/api/notes/${stockSymbol}`);
+            // Attempt to fetch the stock ID using the stock symbol.
+            // This function needs to be defined by you based on your application's logic.
+            const stockId = await fetchStockIdBySymbol(stockSymbol);
+            if (!stockId) {
+              console.error('Stock ID could not be found for symbol:', stockSymbol);
+              return;
+            }
+
+
+            const response = await fetch(`/api/notes/${stockId}`);
             if (!response.ok) throw new Error('Failed to fetch notes');
             const data = await response.json();
-            setNotes(data.notes); // Assuming your API returns an object with a notes array
+
+            // Assuming the API directly returns an array of notes.
+            // Adjust this line if your API's response structure is different.
+            setNotes(data);
           } catch (error) {
             console.error("Error fetching notes:", error);
           }
         };
 
         fetchNotes();
-      }, [stockSymbol]); // Dependency array, fetch notes again if stock_id changes
+      }, [stockSymbol]); // Dependency array, re-fetch notes if stockSymbol changes.
 
-    const handleAddNote = async (e) => {
-        e.preventDefault();
+      const handleAddNote = async (e) => {
+        e.preventDefault(); // Prevent the default form submit action
 
         try {
-            const stockId = await fetchStockIdBySymbol(stockSymbol); // Fetch stock ID by symbol
-            console.log("Stock ID fetched:", stockId);
+            const stockId = await fetchStockIdBySymbol(stockSymbol);
+            if (!stockId) {
+                console.error('Stock ID could not be found for symbol:', stockSymbol);
+                return;
+            }
+
             const response = await fetch('/api/notes', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
-                credentials: 'include',
+                credentials: 'include', // Ensure credentials are included if your API requires authentication
                 body: JSON.stringify({
-                    stock_id: stockId, // Use the fetched stock ID here
-                    note_text: noteText,
+                    stock_id: stockId, // Use the fetched stock ID
+                    note_text: noteText, // The text of the note to add
                 }),
             });
 
-            if (!response.ok) throw new Error('Failed to add note');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error('Failed to add note: ' + (errorData.message || 'Unknown error'));
+            }
 
-            const newNote = await response.json();
-            setNotes((prevNotes) => [...prevNotes, newNote]);
-            setNoteText(''); // Reset input field
+            const newNote = await response.json(); // Assuming this returns the newly added note
+            setNotes(prevNotes => [...prevNotes, newNote]);
+            setNoteText(''); // Reset the note text field after successful note addition
         } catch (error) {
             console.error("Error adding note:", error);
         }
     };
-
-    const startEdit = (note) => {
-        setEditingNote({ id: note.id, text: note.text });
-      };
-
       const saveNoteEdit = async (noteId) => {
         try {
           const response = await fetch(`/api/notes/${noteId}`, {
@@ -470,10 +488,14 @@ const StockDetailPage = () => {
 
       const requestDeleteNoteConfirmation = (noteId) => {
         setModalContent(
-            <div>
-                <p>Are you sure you want to delete this note?</p>
-                <button onClick={() => handleDeleteNoteConfirmed(noteId)}>Confirm</button>
-                <button onClick={closeModal}>Cancel</button>
+            <div className="modal-overlay">
+                <div className="modal-content">
+                    <p className="modal-text">Are you sure you want to delete this note?</p>
+                    <div className="modal-buttons">
+                        <button className="modal-button confirm-button" onClick={() => handleDeleteNoteConfirmed(noteId)}>Confirm</button>
+                        <button className="modal-button cancel-button" onClick={closeModal}>Cancel</button>
+                    </div>
+                </div>
             </div>
         );
     };

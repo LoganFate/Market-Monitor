@@ -25,9 +25,6 @@ def get_stocks():
         if 'error' not in response:
             stock = next((s for s in stocks if s.symbol == response['symbol']), None)
             if stock:
-                # Update database object if necessary (optional)
-                # stock.price = response['close']
-                # db.session.commit()
 
                 enriched_stock_data = {
                     'symbol': response['symbol'],
@@ -37,7 +34,6 @@ def get_stocks():
                     'live_high': response.get('high'),
                     'live_low': response.get('low'),
                     'live_volume': response.get('volume'),
-                    # Map other fields as needed
                 }
                 enriched_stocks.append(enriched_stock_data)
         else:
