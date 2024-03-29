@@ -18,7 +18,7 @@ function HomePage() {
         const fetchData = async () => {
             setIsLoading(true);
             try {
-                const stocksResponse = await fetch('https://market-monitor.onrender.com/api/stocks/');
+                const stocksResponse = await fetch('/api/stocks/');
                 if (!stocksResponse.ok) {
                     throw new Error('Stock data could not be fetched');
                 }
