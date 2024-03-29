@@ -74,6 +74,52 @@ function HomePage() {
         return () => clearInterval(interval);
     }, []);
 
+    async function fetchStockIdBySymbol(stockSymbol) {
+        const response = await fetch(`/api/stocks/${stockSymbol}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch stock ID');
+        }
+        const data = await response.json();
+        return data.id; // Adjust based on how your API responds
+    }
+
+    async function addToWatchlist(stockSymbol) {
+        try {
+            // Fetch the stock ID using the stock symbol
+            const stockId = await fetchStockIdBySymbol(stockSymbol);
+            if (!stockId) {
+                console.error(`Could not find stock ID for symbol: ${stockSymbol}`);
+                alert('Stock ID not found');
+                return;
+            }
+
+            // Then, make the request to add the stock to the watchlist with the fetched stock ID
+            const response = await fetch('/api/watchlist', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'include', // Only if your endpoint requires authentication
+                body: JSON.stringify({
+                    stock_id: stockId,
+                    category: 'default' // Or any other category you wish to specify
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add to watchlist');
+            }
+
+            // Provide feedback to the user
+
+        } catch (error) {
+            console.error("Error adding to watchlist:", error);
+
+        }
+    }
+
+
     if (isLoading) return (
         <div className="loading-container">
           <div className="spinner"></div>
@@ -147,6 +193,7 @@ function HomePage() {
                         {stocks.map(stock => (
                             <li key={stock.symbol} className="home-list-item">
                                 <Link to={`/stock/${stock.symbol}`}>{stock.name}</Link> - ${stock.live_close}
+                                <button onClick={() => addToWatchlist(stock.symbol)} className="add-to-watchlist-btn">+</button>
                             </li>
                         ))}
                     </ul>

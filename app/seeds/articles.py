@@ -44,7 +44,7 @@ def seed_articles():
             content='Content about energy...',
             author='Chris Lee',
             article_url='http://example.com/renewable-energy-sources',
-            image_url='http://example.com/images/renewable-energy-sources.jpg',
+            image_url='https://example.com/images/renewable-energy-sources.jpg',
             published_utc=datetime.utcnow(),
             publisher=json.dumps({"name": "Energy Today", "homepage_url": "https://www.energytoday.com"}),
             category='Energy'
