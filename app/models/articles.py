@@ -9,7 +9,7 @@ class Article(db.Model):
         __table_args__ = {'schema': SCHEMA}
 
 
-    id = db.Column(db.Integer, primary_key=True)  # Assuming id from API is unique
+    id = db.Column(db.String(500), primary_key=True)  # Assuming id from API is unique
     title = db.Column(db.String(255), nullable=False)
     content = db.Column(db.Text, nullable=False)  # You might want to map this to 'description' from the API data
     author = db.Column(db.String(100), nullable=True)

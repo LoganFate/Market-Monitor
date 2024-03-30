@@ -37,7 +37,7 @@ def upgrade():
     )
 
     op.create_table('articles',
-    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('id', sa.String(), nullable=False),
     sa.Column('title', sa.String(length=255), nullable=False),
     sa.Column('content', sa.Text(), nullable=False),
     sa.Column('author', sa.String(length=100), nullable=True),
@@ -68,7 +68,7 @@ def upgrade():
     op.create_table('comments',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('article_id', sa.Integer(), nullable=False),
+    sa.Column('article_id', sa.String(), nullable=False),
     sa.Column('text', sa.Text(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['article_id'], [f'{SCHEMA}.articles.id'] if environment == 'production' else ['articles.id'], ondelete='CASCADE'),
@@ -92,7 +92,7 @@ def upgrade():
     op.create_table('pinned',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('article_id', sa.Integer(), nullable=False),
+    sa.Column('article_id', sa.String(), nullable=False),
     sa.Column('category', sa.String(length=50), nullable=True),
     sa.ForeignKeyConstraint(['article_id'], [f'{SCHEMA}.articles.id'] if environment == 'production' else ['articles.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['user_id'], [f'{SCHEMA}.users.id'] if environment == 'production' else ['users.id'], ondelete='CASCADE'),
