@@ -54,18 +54,6 @@ const StockDetailPage = () => {
             console.error('Failed to fetch historical data:', error);
           }
         };
-        const fetchNotes = async () => {
-            try {
-                const response = await fetch(`/api/notes/${stock_id}`);
-                if (!response.ok) throw new Error('Failed to fetch notes');
-                const data = await response.json();
-                setNotes(data); // Assuming the backend returns an array of notes
-            } catch (error) {
-                console.error("Error fetching notes:", error);
-            }
-        };
-
-        fetchNotes();
 
         fetchHistoricalData();
         checkWatchlistStatus();
