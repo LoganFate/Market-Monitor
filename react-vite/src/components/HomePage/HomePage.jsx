@@ -13,6 +13,7 @@ function HomePage() {
     const [chartData, setChartData] = useState({});
     const apiKey = 'unLg31iXhM99E5yWodIRsOe3pugcBLnl'; // This should be securely handled
     const [articleLimit, setArticleLimit] = useState(15);
+    const [watchlistedStocks, setWatchlistedStocks] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -46,6 +47,17 @@ function HomePage() {
                     return acc;
                   }
                     }, []);
+                    const watchlistResponse = await fetch('/api/watchlist/', {
+                        credentials: 'include', // Only if your endpoint requires authentication
+                    });
+                    if (!watchlistResponse.ok) {
+                        throw new Error('Failed to fetch watchlist');
+                    }
+                    const watchlistData = await watchlistResponse.json();
+
+                    // Assuming watchlistData is an array of stock objects, adjust if necessary
+                    const watchlistSymbols = watchlistData.map(stock => stock.symbol);
+                    setWatchlistedStocks(watchlistSymbols);
 
                     setStocks(stocksData);
                         setArticles(uniqueArticles);
@@ -112,6 +124,7 @@ function HomePage() {
             }
 
             // Provide feedback to the user
+            setWatchlistedStocks(current => [...current, stockSymbol]);
 
         } catch (error) {
             console.error("Error adding to watchlist:", error);
@@ -193,7 +206,9 @@ function HomePage() {
                         {stocks.map(stock => (
                             <li key={stock.symbol} className="home-list-item">
                                 <Link to={`/stock/${stock.symbol}`}>{stock.name}</Link> - ${stock.live_close}
-                                <button onClick={() => addToWatchlist(stock.symbol)} className="add-to-watchlist-btn">+</button>
+                                {!watchlistedStocks.includes(stock.symbol) && (
+            <button onClick={() => addToWatchlist(stock.symbol)} className="add-to-watchlist-btn">+</button>
+        )}
                             </li>
                         ))}
                     </ul>

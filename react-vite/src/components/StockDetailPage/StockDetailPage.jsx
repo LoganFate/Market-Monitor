@@ -251,6 +251,7 @@ const StockDetailPage = () => {
             });
 
             if (!response.ok) throw new Error('Failed to add to watchlist');
+            setIsInWatchlist(true);
 
             // Handle success
             console.log('Stock added to watchlist');
