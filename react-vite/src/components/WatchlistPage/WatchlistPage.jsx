@@ -6,62 +6,114 @@ const WatchlistPage = () => {
 
     const [watchlist, setWatchlist] = useState([]);
     const [editMode, setEditMode] = useState({ active: false, stockId: null, category: '' });
-    const webSocketRefs = useRef({});
+    const webSocketRef = useRef(null);
     const chartRefs = useRef({});
 
     useEffect(() => {
         fetchWatchlist();
         return () => {
-            Object.values(webSocketRefs.current).forEach(ws => ws && ws.close());
+            // Correctly close the WebSocket connection if it exists.
+            if (webSocketRef.current && typeof webSocketRef.current.close === 'function') {
+                webSocketRef.current.close();
+            }
         };
     }, []);
 
     useEffect(() => {
+        if (watchlist.length > 0) {
+            const symbols = watchlist.map(stock => `A.${stock.symbol}`).join(','); // Collecting symbols
+            initWebSocket(symbols); // Initialize WebSocket with all symbols
+        }
+
+        return () => {
+            if (webSocketRef.current && typeof webSocketRef.current.close === 'function') {
+                webSocketRef.current.close();
+            }
+        };
+    }, [watchlist]); // Dependency array includes watchlist to re-run when watchlist changes
+
+
+    // const fetchCandlestickData = useCallback((symbol, candleSeries) => {
+    //     const ws = new WebSocket('wss://delayed.polygon.io/stocks');
+    //     webSocketRefs.current[symbol] = ws;
+
+
+    //     ws.onopen = () => {
+    //         console.log('WebSocket Connected');
+    //         ws.send(JSON.stringify({ action: "auth", params: 'unLg31iXhM99E5yWodIRsOe3pugcBLnl' }));
+    //         ws.send(JSON.stringify({ action: "subscribe", params: `A.${symbol}` }));
+    //     };
+
+    //     ws.onmessage = (event) => {
+    //         console.log('WebSocket message received:', event.data);
+    //         const messages = JSON.parse(event.data);
+
+    //         messages.forEach(message => {
+    //             if (message.ev && message.ev === 'A') { // Check for the correct event type for data messages
+    //                 // We'll assume 'data.s' is the timestamp in an acceptable format
+    //                 const newTimestamp = Math.floor(new Date(message.s).getTime() / 1000);
+    //                 const newCandlestickData = {
+    //                     time: newTimestamp,
+    //                     open: message.o,
+    //                     high: message.h,
+    //                     low: message.l,
+    //                     close: message.c,
+    //                 };
+    //                 candleSeries.update(newCandlestickData); // Update the chart with the new data
+    //         }
+    //     })
+    // }
+    //     ws.onerror = (error) => {
+    //         console.error('WebSocket error:', error);
+    //     };
+
+    //     ws.onclose = () => {
+    //         console.log('WebSocket disconnected');
+    //     };
+    // });
+    const initWebSocket = useCallback((symbols) => {
+        const ws = new WebSocket('wss://delayed.polygon.io/stocks');
+        webSocketRef.current = ws; // Using a single WebSocket reference
+
+        ws.onopen = () => {
+            console.log('WebSocket Connected');
+            ws.send(JSON.stringify({ action: "auth", params: 'unLg31iXhM99E5yWodIRsOe3pugcBLnl' }));
+            // Subscribe to all symbols at once
+            ws.send(JSON.stringify({ action: "subscribe", params: symbols }));
+        };
+
+        ws.onmessage = (event) => {
+            const messages = JSON.parse(event.data);
+            messages.forEach(message => {
+                if (message.ev === 'A') {
+                    // Assuming 'message.sym' gives us the symbol
+                    const symbol = message.sym; // You'll need to adjust based on the actual message structure
+                    const candleSeries = chartRefs.current[symbol];
+                    if (candleSeries) {
+                        // Update the correct chart based on symbol
+                        const newCandlestickData = {
+                            time: Math.floor(new Date().getTime() / 1000),
+                            open: message.o,
+                            high: message.h,
+                            low: message.l,
+                            close: message.c,
+                        };
+                        candleSeries.update(newCandlestickData);
+                    }
+                }
+            });
+        };
+        // Error and close handlers remain the same
+    }, []); // Adjust dependencies if needed
+
+    useEffect(() => {
+        // Initialize charts for each stock in watchlist
         watchlist.forEach(stock => {
             if (!chartRefs.current[stock.symbol]) {
                 initChart(stock.symbol);
             }
         });
-    }, [watchlist]);// Re-run when watchlist changes
-
-    const fetchCandlestickData = useCallback((symbol, candleSeries) => {
-        const ws = new WebSocket('wss://delayed.polygon.io/stocks');
-        webSocketRefs.current[symbol] = ws;
-
-
-        ws.onopen = () => {
-            console.log('WebSocket Connected');
-            ws.send(JSON.stringify({ action: "auth", params: 'unLg31iXhM99E5yWodIRsOe3pugcBLnl' }));
-            ws.send(JSON.stringify({ action: "subscribe", params: `A.${symbol}` }));
-        };
-
-        ws.onmessage = (event) => {
-            console.log('WebSocket message received:', event.data);
-            const messages = JSON.parse(event.data);
-
-            messages.forEach(message => {
-                if (message.ev && message.ev === 'A') { // Check for the correct event type for data messages
-                    // We'll assume 'data.s' is the timestamp in an acceptable format
-                    const newTimestamp = Math.floor(new Date(message.s).getTime() / 1000);
-                    const newCandlestickData = {
-                        time: newTimestamp,
-                        open: message.o,
-                        high: message.h,
-                        low: message.l,
-                        close: message.c,
-                    };
-                    candleSeries.update(newCandlestickData); // Update the chart with the new data
-            }
-        })
-    }
-        ws.onerror = (error) => {
-            console.error('WebSocket error:', error);
-        };
-
-        ws.onclose = () => {
-            console.log('WebSocket disconnected');
-        };
-    });
+    }, [watchlist]); // Added initChart to dependencies
 
     const initChart = useCallback((symbol) => {
         const chartContainer = document.getElementById(`chart-container-${symbol}`);
@@ -92,10 +144,10 @@ const WatchlistPage = () => {
                 },
             });
             const candleSeries = chart.addCandlestickSeries();
-            chartRefs.current[symbol] = chart; // Store the chart instance
-            fetchCandlestickData(symbol, candleSeries);
+            chartRefs.current[symbol] = candleSeries; // Store the chart instance
+
         }
-    }, [fetchCandlestickData]);
+    }, []);
 
 
 
