@@ -14,30 +14,26 @@ def add_stock_to_watchlist():
     stock_id = data.get('stock_id')
     category = data.get('category', 'default')
 
+    # Use ORM to check if the stock exists
     stock = Stock.query.get(stock_id)
     if not stock:
         return jsonify({"error": "Stock not found."}), 404
 
-
-    existing = db.session.execute(
-        text("SELECT 1 FROM watchlist WHERE user_id=:user_id AND stock_id=:stock_id"),
-        {"user_id": current_user.id, "stock_id": stock_id}
-    ).fetchone()
-
+    # Use ORM to check if the stock is already in the user's watchlist
+    existing = Watchlist.query.filter_by(user_id=current_user.id, stock_id=stock_id).first()
     if existing:
         return jsonify({"error": "Stock already in watchlist."}), 409
 
+    # Use ORM to add the stock to the watchlist
+    new_watchlist_entry = Watchlist(user_id=current_user.id, stock_id=stock_id, category=category)
+    db.session.add(new_watchlist_entry)
+    try:
+        db.session.commit()
+        return jsonify({"message": "Stock added to watchlist successfully."}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to add stock to watchlist.", "details": str(e)}), 500
 
-    db.session.execute(
-        text("""
-            INSERT INTO watchlist (user_id, stock_id, category)
-            VALUES (:user_id, :stock_id, :category)
-        """),
-        {"user_id": current_user.id, "stock_id": stock_id, "category": category}
-    )
-    db.session.commit()
-
-    return jsonify({"message": "Stock added to watchlist with category."}), 201
 
 
 @watchlist_routes.route('/', methods=['GET'])
