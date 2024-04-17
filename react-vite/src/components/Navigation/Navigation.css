@@ -43,6 +43,10 @@ nav {
   color: whitesmoke; /* Color when hovered */
 }
 
+.demo-button:hover {
+  background-color: #093c13;
+}
+
 .button {
   background-color: #ffffff; /* Background color for the 'Home' button */
   color: #333333;
@@ -58,6 +62,7 @@ nav {
 }
 
 .button:hover {
+  color: #ffffff;
   background-color: #093c13; /* Darker shade for hover state */
 }
 
