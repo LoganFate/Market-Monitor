@@ -12,7 +12,7 @@ function HomePage() {
     const [error, setError] = useState(null);
     const [chartData, setChartData] = useState({});
     const apiKey = 'unLg31iXhM99E5yWodIRsOe3pugcBLnl'; // This should be securely handled
-    const [articleLimit, setArticleLimit] = useState(15);
+    const [articleLimit, setArticleLimit] = useState();
     const [watchlistedStocks, setWatchlistedStocks] = useState([]);
 
     useEffect(() => {
