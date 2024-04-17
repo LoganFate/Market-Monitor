@@ -1,13 +1,32 @@
 import './LandingPage.css';
 import  SignupFormModal  from '../SignupFormModal';// Import your SignupFormModal component
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom'
+import { thunkLogin } from '../../redux/session';
 import { useModal } from "../../context/Modal"; // Import the useModal hook
 import { useEffect } from "react";
 
 const LandingPage = () => {
     const { setModalContent } = useModal();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const handleSignup = () => {
         setModalContent(<SignupFormModal />);
+      };
+
+      const handleDemoLogin = async () => {
+        const demoEmail = 'demo1@example.com';
+        const demoPassword = 'password1';
+
+
+        const serverResponse = await dispatch(thunkLogin({ email: demoEmail, password: demoPassword }));
+
+        if (!serverResponse) {
+          navigate('/home');
+        } else {
+          console.error("Demo Login Failed");
+        }
       };
 
     return (
@@ -15,7 +34,7 @@ const LandingPage = () => {
             <header className="about-section">
                 <h1>About Market-Monitor</h1>
                 <p>Market-Monitor provides you the ability to plan, track, and research stock movement in real time to develop intelligent and calculated trading strategies that you feel confident about.</p>
-                <button onClick={handleSignup} className="signup-button">Signup</button>
+                <button onClick={handleDemoLogin} className="signup-button">Demo User</button>
             </header>
             <section className="features-section">
                 <div className="feature">

@@ -44,9 +44,10 @@ nav {
 }
 
 .button {
-  background-color: #0c8446; /* Background color for the 'Home' button */
-  color: whitesmoke;
-  border: none;
+  background-color: #ffffff; /* Background color for the 'Home' button */
+  color: #333333;
+  border: 1px solid;
+  border-color: #cacaca;
   padding: 0.5rem 1rem;
   border-radius: 4px;
   transition: background-color 0.3s ease;

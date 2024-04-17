@@ -5,6 +5,7 @@ import { useModal } from "../../context/Modal";
 import LoginFormModal from '../LoginFormModal';
 import SignupFormModal from "../SignupFormModal"
 import { thunkLogout } from "../../redux/session";
+import { thunkLogin } from "../../redux/session";
 import "./Navigation.css";
 
 function Navigation() {
@@ -28,6 +29,21 @@ function Navigation() {
     });
   };
 
+  const handleDemoLogin = async () => {
+    const demoEmail = 'demo1@example.com';
+    const demoPassword = 'password1';
+
+
+    const serverResponse = await dispatch(thunkLogin({ email: demoEmail, password: demoPassword }));
+
+    if (!serverResponse) {
+      navigate('/home');
+    } else {
+      console.error("Demo Login Failed");
+    }
+  };
+
+
 
   return (
     <nav>
@@ -42,8 +58,10 @@ function Navigation() {
       <ul className="nav-links">
         {!user && (
           <>
+
              <button onClick={openLoginModal} className="button">Login</button>
              <li><button onClick={openSignupModal} className="button">Signup</button></li>
+             <button type="button" onClick={handleDemoLogin} className="demo-button">Demo User</button>
           </>
         )}
         {user && (
