@@ -7,13 +7,14 @@ import './HomePage.css'
 function HomePage() {
     const tickers = ['AAPL', 'TSLA', 'GOOGL', 'MSFT']; // Add your tickers here
     const [stocks, setStocks] = useState([]);
-    const [articles, setArticles] = useState([12]);
+    const [articles, setArticles] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [chartData, setChartData] = useState({});
     const apiKey = 'unLg31iXhM99E5yWodIRsOe3pugcBLnl'; // This should be securely handled
     const [articleLimit, setArticleLimit] = useState();
     const [watchlistedStocks, setWatchlistedStocks] = useState([]);
+    const [displayLimit, setDisplayLimit] = useState(9);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -190,6 +191,11 @@ function HomePage() {
     //     }
     // };
 
+    const loadMoreStocks = () => {
+        setDisplayLimit(prevLimit => prevLimit + 9); // Load 9 more stocks
+      };
+
+
     return (
         <div className="container">
         <h2 className="heading">Featured Stocks</h2>
@@ -202,8 +208,9 @@ function HomePage() {
         // Any additional options...
     }}  />
                     </div>
-                    <ul className="list">
-                        {stocks.map(stock => (
+                    <div className="stock-container">
+                    <ul className="list stock-list">
+                    {stocks.slice(0, displayLimit).map(stock => (
                             <li key={stock.symbol} className="home-list-item">
                                 <Link to={`/stock/${stock.symbol}`}>{stock.name}</Link> - ${stock.live_close}
                                 {!watchlistedStocks.includes(stock.symbol) && (
@@ -212,6 +219,12 @@ function HomePage() {
                             </li>
                         ))}
                     </ul>
+                    {displayLimit < stocks.length && (
+    <button onClick={loadMoreStocks} className="load-more-btn">
+      Load More
+    </button>
+  )}
+                    </div>
                 </div>
             )}
         <h2 className="heading">Latest Articles</h2>
