@@ -15,6 +15,8 @@ const LandingPage = () => {
         setModalContent(<SignupFormModal />);
       };
 
+
+
       const handleDemoLogin = async () => {
         const demoEmail = 'demo1@example.com';
         const demoPassword = 'password1';
