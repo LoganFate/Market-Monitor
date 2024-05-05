@@ -269,10 +269,12 @@ Stock(
             previous_close=120.50
         )
 
+
     ]
 
     db.session.bulk_save_objects(stocks)
     db.session.commit()
+
 
 
 # Function to undo the seeding
