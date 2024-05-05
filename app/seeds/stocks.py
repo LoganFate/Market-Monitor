@@ -258,6 +258,8 @@ Stock(
             sector='Information Technology',
             previous_close=168.50
         ),
+
+
         Stock(
             symbol='SPOT',
             name='Spotify Technology S.A.',
