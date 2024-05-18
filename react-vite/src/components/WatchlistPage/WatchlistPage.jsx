@@ -72,6 +72,8 @@ const WatchlistPage = () => {
     //         console.log('WebSocket disconnected');
     //     };
     // });
+
+
     const initWebSocket = useCallback((symbols) => {
         const ws = new WebSocket('wss://delayed.polygon.io/stocks');
         webSocketRef.current = ws; // Using a single WebSocket reference
