@@ -9,6 +9,7 @@ const WatchlistPage = () => {
     const webSocketRef = useRef(null);
     const chartRefs = useRef({});
 
+
     useEffect(() => {
         fetchWatchlist();
         return () => {
