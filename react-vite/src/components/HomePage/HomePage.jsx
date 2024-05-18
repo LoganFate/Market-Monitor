@@ -17,6 +17,7 @@ function HomePage() {
     const [displayLimit, setDisplayLimit] = useState(9);
 
     useEffect(() => {
+
         const fetchData = async () => {
             setIsLoading(true);
             try {
