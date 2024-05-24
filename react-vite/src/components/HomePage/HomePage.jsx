@@ -61,6 +61,7 @@ function HomePage() {
                     const watchlistSymbols = watchlistData.map(stock => stock.symbol);
                     setWatchlistedStocks(watchlistSymbols);
 
+
                     setStocks(stocksData);
                         setArticles(uniqueArticles);
 // Other state updates...
