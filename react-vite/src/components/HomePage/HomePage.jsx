@@ -20,6 +20,7 @@ function HomePage() {
 
         const fetchData = async () => {
             setIsLoading(true);
+            
             try {
                 const stocksResponse = await fetch('/api/stocks/');
                 if (!stocksResponse.ok) {
