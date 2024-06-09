@@ -23,6 +23,7 @@ const LandingPage = () => {
         const demoPassword = 'password1';
 
 
+
         const serverResponse = await dispatch(thunkLogin({ email: demoEmail, password: demoPassword }));
 
         if (!serverResponse) {
