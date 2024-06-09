@@ -85,6 +85,7 @@ const WatchlistPage = () => {
             ws.send(JSON.stringify({ action: "subscribe", params: symbols }));
         };
 
+
         ws.onmessage = (event) => {
             const messages = JSON.parse(event.data);
             messages.forEach(message => {
