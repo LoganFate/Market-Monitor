@@ -86,6 +86,7 @@ const WatchlistPage = () => {
         };
 
 
+
         ws.onmessage = (event) => {
             const messages = JSON.parse(event.data);
             messages.forEach(message => {
