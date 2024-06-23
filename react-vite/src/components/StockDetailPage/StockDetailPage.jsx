@@ -529,6 +529,7 @@ const StockDetailPage = () => {
     {!isInWatchlist && (
                 <button onClick={() => addToWatchlist(stockSymbol)}>Add to Watchlist</button>
             )}
+
     <div className="notes-list">
   {notes.map((note) => (
     <div key={note.id} className="note">
